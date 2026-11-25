@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BUDGET PLANNER - Europe Trip (₹15 Lakhs)</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ALERT NOTIFICATION BANNER CONTAINER -->
+  <div id="alert-banner-container" class="alert-banner-container"></div>
+
+  <!-- LOGIN PAGE SCREEN -->
+  <div id="login-screen" class="login-screen">
+    <div class="login-backdrop"></div>
+    <div class="login-card glass-card">
+      <div class="login-header">
+        <div class="app-logo">✈️</div>
+        <h2>BUDGET PLANNER</h2>
+        <span class="trip-tag-badge"><i class="fa-solid fa-earth-europe"></i> Europe Tour 2026 (₹15 Lakhs Budget)</span>
+        <p>Manage Lodge, Cabs, Food, Flights, Entertainment & Excursion Expenses</p>
+      </div>
+
+      <form id="login-form" class="login-form">
+        <div class="form-group">
+          <label for="login-role"><i class="fa-solid fa-shield-halved"></i> Access Portal Role</label>
+          <select id="login-role" class="form-select">
+            <option value="user">👤 Traveler Module (Alex - Europe 15L Budget)</option>
+            <option value="admin">⚡ Admin Module (System Management)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="login-username"><i class="fa-solid fa-user"></i> Username</label>
+          <input type="text" id="login-username" placeholder="Enter username (e.g. alex or admin)" required autocomplete="username">
+        </div>
+
+        <div class="form-group">
+          <label for="login-password"><i class="fa-solid fa-lock"></i> Password</label>
+          <div class="password-input-wrapper">
+            <input type="password" id="login-password" placeholder="••••••••" required autocomplete="current-password">
+            <button type="button" id="toggle-password-btn" class="toggle-password-btn" title="Toggle password visibility">
+              <i class="fa-solid fa-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="login-actions space-y-sm">
+          <button type="submit" class="btn btn-primary btn-block">
+            <i class="fa-solid fa-right-to-bracket"></i> Login to Europe Planner
+          </button>
+        </div>
+      </form>
+
+      <!-- DEMO LOGIN QUICK SWITCH BUTTONS -->
+      <div class="demo-login-box">
+        <span class="demo-title"><i class="fa-solid fa-bolt"></i> Quick One-Click Demo Access:</span>
+        <div class="demo-btns-grid">
+          <button type="button" class="btn btn-success btn-sm btn-block" id="demo-user-btn">
+            <i class="fa-solid fa-passport"></i> Login as Traveler (Alex - 15 Lakhs)
+          </button>
+          <button type="button" class="btn btn-warning btn-sm btn-block" id="demo-admin-btn">
+            <i class="fa-solid fa-user-shield"></i> Login as Admin (System Admin)
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN APP SCREEN CONTAINER -->
+  <div id="app-screen" class="app-screen hidden">
+    
+    <!-- SIDEBAR NAVIGATION -->
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <span class="logo-icon">✈️</span>
+          <div class="logo-title-group">
+            <span class="logo-text">BUDGET PLANNER</span>
+            <span class="logo-subtext">Europe Trip (₹15 Lakhs)</span>
+          </div>
+        </div>
+        <button id="close-sidebar-btn" class="icon-btn mobile-only" aria-label="Close Sidebar">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- PORTAL MODE BADGE IN SIDEBAR -->
+      <div class="sidebar-portal-badge-container">
+        <span id="sidebar-portal-badge" class="badge badge-success">
+          <i class="fa-solid fa-plane-departure"></i> Traveler Portal
+        </span>
+      </div>
+
+      <!-- USER MODULE NAV MENU -->
+      <nav id="user-sidebar-nav" class="sidebar-nav">
+        <ul>
+          <li class="nav-item active" data-tab="dashboard">
+            <a href="#dashboard"><i class="fa-solid fa-house"></i> <span>Europe Overview</span></a>
+          </li>
+          <li class="nav-item" data-tab="income">
+            <a href="#income"><i class="fa-solid fa-vault"></i> <span>Trip Budget Allocation</span></a>
+          </li>
+          <li class="nav-item" data-tab="expenses">
+            <a href="#expenses"><i class="fa-solid fa-receipt"></i> <span>Log Trip Expenses</span></a>
+          </li>
+          <li class="nav-item" data-tab="savings">
+            <a href="#savings"><i class="fa-solid fa-earth-europe"></i> <span>City Leg Budgets</span></a>
+          </li>
+          <li class="nav-item" data-tab="budgets">
+            <a href="#budgets"><i class="fa-solid fa-sliders"></i> <span>Category Limits</span></a>
+          </li>
+          <li class="nav-item" data-tab="analytics">
+            <a href="#analytics"><i class="fa-solid fa-chart-pie"></i> <span>Trip Analytics</span></a>
+          </li>
+          <li class="nav-item" data-tab="transactions">
+            <a href="#transactions"><i class="fa-solid fa-list-check"></i> <span>Expense History</span></a>
+          </li>
+          <li class="nav-item" data-tab="settings">
+            <a href="#settings"><i class="fa-solid fa-gear"></i> <span>Preferences & Currency</span></a>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- ADMIN MODULE NAV MENU -->
+      <nav id="admin-sidebar-nav" class="sidebar-nav hidden">
+        <ul>
+          <li class="nav-item active" data-tab="admin-dashboard">
+            <a href="#admin-dashboard"><i class="fa-solid fa-chart-line"></i> <span>Admin Dashboard</span></a>
+          </li>
+          <li class="nav-item" data-tab="admin-users">
+            <a href="#admin-users"><i class="fa-solid fa-users-gear"></i> <span>User Management</span></a>
+          </li>
+          <li class="nav-item" data-tab="admin-transactions">
+            <a href="#admin-transactions"><i class="fa-solid fa-globe"></i> <span>All Trip Transactions</span></a>
+          </li>
+          <li class="nav-item" data-tab="admin-audit">
+            <a href="#admin-audit"><i class="fa-solid fa-scroll"></i> <span>System Audit Trail</span></a>
+          </li>
+          <li class="nav-item" data-tab="admin-settings">
+            <a href="#admin-settings"><i class="fa-solid fa-sliders"></i> <span>System Policy Settings</span></a>
+          </li>
+        </ul>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-mini-card">
+          <div class="user-avatar" id="sidebar-user-avatar">AM</div>
+          <div class="user-info">
+            <div class="user-name" id="sidebar-user-name">Alex Morgan</div>
+            <div class="user-role" id="sidebar-user-role-label">Traveler Role</div>
+          </div>
+        </div>
+        <button id="logout-btn" class="btn btn-logout btn-block">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i> <span>Logout</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- SIDEBAR OVERLAY FOR MOBILE -->
+    <div id="sidebar-overlay" class="sidebar-overlay"></div>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="main-content">
+      <!-- TOPBAR / HEADER -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button id="hamburger-btn" class="icon-btn mobile-only" aria-label="Open Sidebar">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+          <div class="header-titles">
+            <h1 id="page-title">Europe Overview</h1>
+            <p id="header-welcome-text" class="subtitle">Welcome back, <span id="user-display-name">Alex</span>! Trip Budget: <strong>₹15,00,000 INR</strong></p>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <!-- REAL-TIME CURRENCY TOGGLE (INR ₹ / EUR €) -->
+          <button id="currency-toggle-btn" class="currency-toggle-btn" title="Toggle Currency (₹ INR / € EUR)">
+            <i class="fa-solid fa-coins"></i>
+            <span id="currency-toggle-label">Currency: ₹ INR</span>
+          </button>
+
+          <div class="month-pill">
+            <i class="fa-solid fa-plane"></i>
+            <span id="current-month-display">Europe Trip 2026</span>
+          </div>
+
+          <button id="theme-toggle-btn" class="icon-btn" title="Toggle Light/Dark Theme">
+            <i class="fa-solid fa-moon"></i>
+          </button>
+
+          <!-- USER QUICK ACTIONS -->
+          <div id="user-quick-actions" class="quick-action-group">
+            <button class="btn btn-primary btn-sm" id="quick-add-income-btn" title="Add Trip Fund">
+              <i class="fa-solid fa-plus"></i> <span class="desktop-only">Add Fund</span>
+            </button>
+            <button class="btn btn-danger btn-sm" id="quick-add-expense-btn" title="Add Trip Expense">
+              <i class="fa-solid fa-minus"></i> <span class="desktop-only">Log Expense</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- ==================================================================== -->
+      <!-- USER MODULE TAB PANELS -->
+      <!-- ==================================================================== -->
+
+      <!-- TAB 1: USER DASHBOARD -->
+      <section id="tab-dashboard" class="tab-panel active">
+        <div id="dashboard-alerts" class="dashboard-alerts-section"></div>
+
+        <!-- TRIP HERO CARD BANNER -->
+        <div class="trip-hero-banner card glass-card">
+          <div class="trip-hero-content">
+            <h2><i class="fa-solid fa-passport"></i> Europe Tour 2026 - Master Financial Planner</h2>
+            <p>Total Master Allocation: <strong>₹15,00,000 INR</strong> (~€16,666 EUR). Tracking Lodge, Food, Cabs, Flights, Sightseeing, Shopping, Visa & Insurance.</p>
+          </div>
+          <div class="trip-hero-stats">
+            <div class="trip-hero-stat">
+              <span>Target Budget</span>
+              <h3 id="hero-target-budget">₹15,00,000</h3>
+            </div>
+            <div class="trip-hero-stat">
+              <span>Total Spent</span>
+              <h3 id="hero-total-spent" style="color: var(--color-danger);">₹0.00</h3>
+            </div>
+            <div class="trip-hero-stat">
+              <span>Available Surplus</span>
+              <h3 id="hero-available-surplus" style="color: var(--color-success);">₹15,00,000</h3>
+            </div>
+          </div>
+        </div>
+
+        <div class="kpi-grid">
+          <div class="kpi-card income-card">
+            <div class="kpi-icon"><i class="fa-solid fa-vault"></i></div>
+            <div class="kpi-details">
+              <span class="kpi-title">Total Allocated Budget</span>
+              <h2 class="kpi-value" id="dash-total-income">₹15,00,000.00</h2>
+              <span class="kpi-subtext" id="dash-income-count">15 Lakhs INR Fund</span>
+            </div>
+          </div>
+
+          <div class="kpi-card expense-card">
+            <div class="kpi-icon"><i class="fa-solid fa-receipt"></i></div>
+            <div class="kpi-details">
+              <span class="kpi-title">Total Expenses Logged</span>
+              <h2 class="kpi-value" id="dash-total-expenses">₹0.00</h2>
+              <span class="kpi-subtext" id="dash-expense-count">0 items</span>
+            </div>
+          </div>
+
+          <div class="kpi-card balance-card">
+            <div class="kpi-icon"><i class="fa-solid fa-wallet"></i></div>
+            <div class="kpi-details">
+              <span class="kpi-title">Remaining Trip Funds</span>
+              <h2 class="kpi-value" id="dash-remaining-balance">₹15,00,000.00</h2>
+              <span class="kpi-subtext" id="dash-balance-ratio">100% available</span>
+            </div>
+          </div>
+
+          <div class="kpi-card savings-card">
+            <div class="kpi-icon"><i class="fa-solid fa-earth-europe"></i></div>
+            <div class="kpi-details">
+              <span class="kpi-title">City Leg Allocations</span>
+              <h2 class="kpi-value" id="dash-total-savings">₹0.00</h2>
+              <span class="kpi-subtext" id="dash-savings-count">Target City Legs</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-2-col">
+          <div class="card glass-card">
+            <div class="card-header">
+              <h3><i class="fa-solid fa-chart-pie"></i> Europe Spending Distribution</h3>
+              <button class="btn-link" onclick="switchTab('analytics')">View Analytics</button>
+            </div>
+            <div class="chart-wrapper doughnut-wrapper">
+              <canvas id="dashExpenseDoughnutChart"></canvas>
+            </div>
+          </div>
+
+          <div class="card glass-card">
+            <div class="card-header">
+              <h3><i class="fa-solid fa-sliders"></i> Category Budget Limits</h3>
+              <button class="btn-link" onclick="switchTab('budgets')">Manage Limits</button>
+            </div>
+            <div id="dash-budget-progress-list" class="budget-progress-list"></div>
+          </div>
+        </div>
+
+        <div class="card glass-card margin-top">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-clock-rotate-left"></i> Recent Europe Expenses</h3>
+            <button class="btn-link" onclick="switchTab('transactions')">View All Expenses</button>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Type</th>
+                  <th>Description</th>
+                  <th>Category</th>
+                  <th>Amount</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="dash-recent-transactions-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: TRIP BUDGET ALLOCATION -->
+      <section id="tab-income" class="tab-panel">
+        <div class="grid-2-col-sidebar">
+          <div class="card glass-card">
+            <div class="card-header">
+              <h3><i class="fa-solid fa-circle-plus"></i> Add / Deposit Trip Funds</h3>
+            </div>
+            <form id="add-income-form" class="app-form">
+              <div class="form-group">
+                <label for="inc-source">Fund Title / Source</label>
+                <input type="text" id="inc-source" placeholder="e.g. Initial Europe Budget or Savings Deposit" required>
+              </div>
+
+              <div class="form-group">
+                <label for="inc-amount">Fund Amount</label>
+                <input type="number" id="inc-amount" min="1" step="0.01" placeholder="e.g. 1500000" required>
+              </div>
+
+              <div class="form-group">
+                <label for="inc-date">Date Allocated</label>
+                <input type="date" id="inc-date" required>
+              </div>
+
+              <div class="form-group">
+                <label for="inc-category">Category</label>
+                <select id="inc-category" required>
+                  <option value="Trip Fund">Trip Fund Allocation</option>
+                  <option value="Savings Deposit">Savings Deposit</option>
+                  <option value="Sponsorship">Sponsorship / Bonus</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+
+              <button type="submit" class="btn btn-success btn-block">
+                <i class="fa-solid fa-plus-circle"></i> Add Trip Fund
+              </button>
+            </form>
+          </div>
+
+          <div class="card glass-card">
+            <div class="card-header">
+              <h3><i class="fa-solid fa-vault"></i> Allocated Europe Trip Funds</h3>
+              <span class="badge badge-success" id="income-page-total">Total: ₹15,00,000.00</span>
+            </div>
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Fund Source</th>
+                    <th>Category</th>
+                    <th>Amount</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="income-table-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: LOG TRIP EXPENSES -->
+      <section id="tab-expenses" class="tab-panel">
+        <div class="grid-2-col-sidebar">
+          <div class="card glass-card">
+            <div class="card-header">
+              <h3><i class="fa-solid fa-circle-minus"></i> Record Europe Trip Expense</h3>
+            </div>
+            <form id="add-expense-form" class="app-form">
+              <div class="form-group">
+                <label for="exp-name">Expense Description</label>
+                <input type="text" id="exp-name" placeholder="e.g. Hotel Stay in Paris / Eurail Pass / Colosseum Ticket" required>
+              </div>
+
+              <div class="form-group">
+                <label for="exp-amount">Amount</label>
+                <input type="number" id="exp-amount" min="1" step="0.01" placeholder="e.g. 45000" required>
+              </div>
+
+              <div class="form-group">
+                <label for="exp-date">Date</label>
+                <input type="date" id="exp-date" required>
+              </div>
+
+              <div class="form-group">
+                <label for="exp-category">Expense Category</label>
+                <select id="exp-category" required>
+                  <option value="Lodge">🏨 Lodge (Hotels, Hostels, Airbnb)</option>
+                  <option value="Food">🍽️ Food (Dining, Cafes, Gelato)</option>
+                  <option value="Cabs">🚕 Cabs & Transport (Cabs, Rail Pass, Metro)</option>
+                  <option value="Entertainment">🎟️ Entertainment (Shows, Cruises, Nightlife)</option>
+                  <option value="Flights">✈️ Flights (International & Europe Flights)</option>
+                  <option value="Sightseeing">🏛️ Sightseeing (Museums & Entry Passes)</option>
+                  <option value="Shopping">🛍️ Shopping (Souvenirs & Outlets)</option>
+                  <option value="Visa & Insurance">🛂 Visa & Insurance (Schengen, Forex)</option>
+                  <option value="Other">📦 Other (Contingency Reserve)</option>
+                </select>
+              </div>
+
+              <button type="submit" class="btn btn-danger btn-block">
+                <i class="fa-solid fa-minus-circle"></i> Log Expense
+              </button>
+            </form>
+          </div>
+
+          <div class="space-y">
+            <div class="card glass-card">
+              <div class="card-header">
+                <h3><i class="fa-solid fa-shapes"></i> Category Spending Breakdown</h3>
+              </div>
+              <div id="category-spending-grid" class="category-spending-grid"></div>
+            </div>
+
+            <div class="card glass-card">
+              <div class="card-header">
+                <h3><i class="fa-solid fa-receipt"></i> Logged Expenses List</h3>
+                <span class="badge badge-danger" id="expense-page-total">Total Spent: ₹0.00</span>
+              </div>
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Expense Item</th>
+                      <th>Category</th>
+                      <th>Amount</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="expense-table-body"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 4: CITY LEG BUDGETS & GOALS -->
+      <section id="tab-savings" class="tab-panel">
+        <div class="savings-page-header">
+          <div>
+            <h2><i class="fa-solid fa-earth-europe"></i> European Country & City Leg Budgets</h2>
+            <p>Allocate funds to specific trip legs (e.g. France, Switzerland, Italy, Netherlands).</p>
+          </div>
+          <button class="btn btn-primary" id="open-add-goal-modal-btn">
+            <i class="fa-solid fa-plus"></i> New City Leg Goal
+          </button>
+        </div>
+
+        <div id="savings-goals-container" class="savings-goals-grid"></div>
+      </section>
+
+      <!-- TAB 5: CATEGORY BUDGET LIMITS -->
+      <section id="tab-budgets" class="tab-panel">
+        <div class="budgets-header">
+          <div>
+            <h2><i class="fa-solid fa-sliders"></i> Europe Trip Category Budget Caps</h2>
+            <p>Set max budget caps for Lodge, Food, Cabs, Flights, Entertainment, etc. (Target: ₹15 Lakhs total).</p>
+          </div>
+        </div>
+        <div id="category-budgets-grid" class="category-budgets-grid"></div>
+      </section>
+
+      <!-- TAB 6: TRIP ANALYTICS -->
+      <section id="tab-analytics" class="tab-panel">
+        <div class="analytics-filter-bar card glass-card">
+          <div class="filter-group">
+            <label for="analytics-month-select"><i class="fa-solid fa-calendar"></i> Select Trip Month:</label>
+            <input type="month" id="analytics-month-select" class="form-input-sm">
+          </div>
+          <div class="analytics-summary-badges">
+            <span class="badge badge-outline" id="analytics-highest-category">Highest Category: N/A</span>
+            <span class="badge badge-outline" id="analytics-transaction-count">0 Expenses</span>
+          </div>
+        </div>
+
+        <div class="grid-2-col">
+          <div class="card glass-card">
+            <div class="card-header">
+              <h3><i class="fa-solid fa-chart-pie"></i> Category Expense Ratio (%)</h3>
+            </div>
+            <div class="chart-wrapper">
+              <canvas id="analyticsExpenseDoughnutChart"></canvas>
+            </div>
+          </div>
+
+          <div class="card glass-card">
+            <div class="card-header">
+              <h3><i class="fa-solid fa-chart-column"></i> Daily Spending Timeline</h3>
+            </div>
+            <div class="chart-wrapper">
+              <canvas id="analyticsMonthlySpendingChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="card glass-card margin-top">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-chart-line"></i> Total Budget vs Expense Consumption</h3>
+          </div>
+          <div class="chart-wrapper chart-wrapper-lg">
+            <canvas id="analyticsIncomeVsExpenseChart"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 7: EXPENSE HISTORY & SEARCH -->
+      <section id="tab-transactions" class="tab-panel">
+        <div class="card glass-card margin-bottom">
+          <div class="transactions-filter-wrapper">
+            <div class="search-input-wrapper">
+              <i class="fa-solid fa-magnifying-glass search-icon"></i>
+              <input type="text" id="tx-search-input" placeholder="Search expenses by title, hotel, cab, city...">
+            </div>
+
+            <div class="filter-controls">
+              <select id="tx-type-filter" class="form-select">
+                <option value="all">All Types</option>
+                <option value="income">Trip Fund Deposits</option>
+                <option value="expense">Trip Expenses</option>
+              </select>
+
+              <select id="tx-category-filter" class="form-select">
+                <option value="all">All Categories</option>
+                <option value="Lodge">Lodge</option>
+                <option value="Food">Food</option>
+                <option value="Cabs">Cabs & Transport</option>
+                <option value="Entertainment">Entertainment</option>
+                <option value="Flights">Flights</option>
+                <option value="Sightseeing">Sightseeing</option>
+                <option value="Shopping">Shopping</option>
+                <option value="Visa & Insurance">Visa & Insurance</option>
+                <option value="Other">Other</option>
+              </select>
+
+              <input type="month" id="tx-month-filter" class="form-select">
+
+              <button id="tx-reset-filters-btn" class="btn btn-secondary btn-sm" title="Reset Filters">
+                <i class="fa-solid fa-rotate-left"></i> Reset
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card glass-card">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-list"></i> Detailed Expense Log</h3>
+            <button id="export-csv-btn" class="btn btn-outline btn-sm">
+              <i class="fa-solid fa-file-csv"></i> Export CSV Report
+            </button>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Type</th>
+                  <th>Description</th>
+                  <th>Category</th>
+                  <th>Amount</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="master-transactions-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 8: USER SETTINGS -->
+      <section id="tab-settings" class="tab-panel">
+        <div class="grid-2-col">
+          <div class="card glass-card">
+            <div class="card-header">
+              <h3><i class="fa-solid fa-user-gear"></i> Traveler Preferences</h3>
+            </div>
+            <form id="settings-profile-form" class="app-form">
+              <div class="form-group">
+                <label for="settings-user-name">Traveler Name</label>
+                <input type="text" id="settings-user-name" required>
+              </div>
+
+              <div class="form-group">
+                <label for="settings-currency">Base Display Currency</label>
+                <select id="settings-currency">
+                  <option value="₹">₹ (INR - Indian Rupee)</option>
+                  <option value="€">€ (EUR - Euro) [Rate: 1 EUR = ₹90]</option>
+                  <option value="$">$ (USD - US Dollar)</option>
+                  <option value="£">£ (GBP - British Pound)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="settings-trip-budget">Master Europe Budget Target</label>
+                <input type="number" id="settings-trip-budget" value="1500000" step="10000" required>
+              </div>
+
+              <button type="submit" class="btn btn-primary">Save Preferences</button>
+            </form>
+          </div>
+
+          <div class="card glass-card">
+            <div class="card-header">
+              <h3><i class="fa-solid fa-database"></i> Storage & Backup Controls</h3>
+            </div>
+            <div class="settings-data-options space-y">
+              <div class="data-option-box">
+                <div>
+                  <h4>Reset to Default 15L Europe Trip Data</h4>
+                  <p>Restore default 15 Lakhs Europe budget dataset with Lodge, Cabs, Food, Flights, and Visa records.</p>
+                </div>
+                <button id="reset-default-trip-btn" class="btn btn-secondary btn-sm">Restore Europe Demo Data</button>
+              </div>
+
+              <div class="data-option-box">
+                <div>
+                  <h4>Session State</h4>
+                  <p id="session-info-text">Active Session Token in JS sessionStorage.</p>
+                </div>
+                <button id="clear-session-btn" class="btn btn-secondary btn-sm">End Session</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================================================================== -->
+      <!-- ADMIN MODULE TAB PANELS -->
+      <!-- ==================================================================== -->
+
+      <!-- TAB 9: ADMIN DASHBOARD -->
+      <section id="tab-admin-dashboard" class="tab-panel">
+        <div class="admin-welcome-banner card glass-card margin-bottom">
+          <div>
+            <h2><i class="fa-solid fa-shield-halved"></i> System Administration & Oversight</h2>
+            <p>Monitor traveler budgets, global system circulation, audit trails, and policy configurations.</p>
+          </div>
+          <span class="badge badge-warning" style="font-size: 0.9rem; padding: 0.5rem 1rem;">
+            ⚡ ADMIN SYSTEM MODE
+          </span>
+        </div>
+
+        <!-- ADMIN SYSTEM KPIS -->
+        <div class="kpi-grid">
+          <div class="kpi-card income-card">
+            <div class="kpi-icon"><i class="fa-solid fa-users"></i></div>
+            <div class="kpi-details">
+              <span class="kpi-title">Registered Travelers</span>
+              <h2 class="kpi-value" id="admin-total-users">0</h2>
+              <span class="kpi-subtext" id="admin-active-users">0 active users</span>
+            </div>
+          </div>
+
+          <div class="kpi-card balance-card">
+            <div class="kpi-icon"><i class="fa-solid fa-vault"></i></div>
+            <div class="kpi-details">
+              <span class="kpi-title">Total Allocated Funds</span>
+              <h2 class="kpi-value" id="admin-system-income">₹0.00</h2>
+              <span class="kpi-subtext">Across all user trips</span>
+            </div>
+          </div>
+
+          <div class="kpi-card expense-card">
+            <div class="kpi-icon"><i class="fa-solid fa-receipt"></i></div>
+            <div class="kpi-details">
+              <span class="kpi-title">Total System Expenses</span>
+              <h2 class="kpi-value" id="admin-system-expenses">₹0.00</h2>
+              <span class="kpi-subtext">Across all categories</span>
+            </div>
+          </div>
+
+          <div class="kpi-card savings-card">
+            <div class="kpi-icon"><i class="fa-solid fa-scale-balanced"></i></div>
+            <div class="kpi-details">
+              <span class="kpi-title">Net Unspent Surplus</span>
+              <h2 class="kpi-value" id="admin-system-balance">₹0.00</h2>
+              <span class="kpi-subtext">Remaining liquidity</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ADMIN SYSTEM CHARTS -->
+        <div class="grid-2-col">
+          <div class="card glass-card">
+            <div class="card-header">
+              <h3><i class="fa-solid fa-chart-pie"></i> System Expense Categories</h3>
+            </div>
+            <div class="chart-wrapper">
+              <canvas id="adminSystemExpenseChart"></canvas>
+            </div>
+          </div>
+
+          <div class="card glass-card">
+            <div class="card-header">
+              <h3><i class="fa-solid fa-chart-column"></i> Traveler Expense Overview</h3>
+            </div>
+            <div class="chart-wrapper">
+              <canvas id="adminUserDistributionChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 10: ADMIN USER MANAGEMENT -->
+      <section id="tab-admin-users" class="tab-panel">
+        <div class="savings-page-header">
+          <div>
+            <h2><i class="fa-solid fa-users-gear"></i> Traveler Directory & Access Management</h2>
+            <p>Manage user accounts, adjust trip permissions, and toggle access status.</p>
+          </div>
+          <button class="btn btn-primary" id="admin-open-add-user-modal-btn">
+            <i class="fa-solid fa-user-plus"></i> Create New Traveler Account
+          </button>
+        </div>
+
+        <div class="card glass-card">
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Traveler</th>
+                  <th>Username</th>
+                  <th>Role</th>
+                  <th>Status</th>
+                  <th>Transactions</th>
+                  <th>Total Spent</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="admin-users-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 11: ALL TRANSACTIONS MONITOR (ADMIN) -->
+      <section id="tab-admin-transactions" class="tab-panel">
+        <div class="card glass-card margin-bottom">
+          <div class="transactions-filter-wrapper">
+            <div class="search-input-wrapper">
+              <i class="fa-solid fa-magnifying-glass search-icon"></i>
+              <input type="text" id="admin-tx-search" placeholder="Search all traveler transactions...">
+            </div>
+
+            <div class="filter-controls">
+              <select id="admin-tx-user-filter" class="form-select">
+                <option value="all">All Travelers</option>
+              </select>
+
+              <select id="admin-tx-type-filter" class="form-select">
+                <option value="all">All Types</option>
+                <option value="income">Trip Funds Only</option>
+                <option value="expense">Expenses Only</option>
+              </select>
+
+              <button id="admin-export-csv-btn" class="btn btn-outline btn-sm">
+                <i class="fa-solid fa-file-csv"></i> Export System CSV
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card glass-card">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-globe"></i> Global System Expenses Log</h3>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Owner</th>
+                  <th>Date</th>
+                  <th>Type</th>
+                  <th>Description</th>
+                  <th>Category</th>
+                  <th>Amount</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="admin-transactions-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 12: SYSTEM AUDIT TRAIL (ADMIN) -->
+      <section id="tab-admin-audit" class="tab-panel">
+        <div class="card glass-card margin-bottom">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-scroll"></i> System Audit Trail & Events</h3>
+            <button id="clear-audit-logs-btn" class="btn btn-outline btn-sm">Clear Audit Logs</button>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Timestamp</th>
+                  <th>Action Event</th>
+                  <th>Performed By</th>
+                  <th>Details</th>
+                </tr>
+              </thead>
+              <tbody id="admin-audit-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 13: SYSTEM POLICY & DATABASE (ADMIN) -->
+      <section id="tab-admin-settings" class="tab-panel">
+        <div class="grid-2-col">
+          <div class="card glass-card">
+            <div class="card-header">
+              <h3><i class="fa-solid fa-sliders"></i> Default Category Budget Policy</h3>
+            </div>
+            <p>Set default Europe category limits for new traveler accounts.</p>
+            <form id="admin-default-budgets-form" class="app-form margin-top">
+              <div class="form-group">
+                <label for="def-lodge-budget">Lodge Limit (₹)</label>
+                <input type="number" id="def-lodge-budget" value="400000" required>
+              </div>
+              <div class="form-group">
+                <label for="def-flights-budget">Flights Limit (₹)</label>
+                <input type="number" id="def-flights-budget" value="300000" required>
+              </div>
+              <div class="form-group">
+                <label for="def-food-budget">Food Limit (₹)</label>
+                <input type="number" id="def-food-budget" value="250000" required>
+              </div>
+              <div class="form-group">
+                <label for="def-cabs-budget">Cabs & Transport Limit (₹)</label>
+                <input type="number" id="def-cabs-budget" value="150000" required>
+              </div>
+              <button type="submit" class="btn btn-primary">Update Default Policy</button>
+            </form>
+          </div>
+
+          <div class="card glass-card">
+            <div class="card-header">
+              <h3><i class="fa-solid fa-database"></i> Database Administration</h3>
+            </div>
+            <div class="settings-data-options space-y">
+              <div class="data-option-box">
+                <div>
+                  <h4>Reset 15L Europe Sample DB</h4>
+                  <p>Repopulate localStorage with 15 Lakhs Europe trip default data.</p>
+                </div>
+                <button id="admin-reset-db-btn" class="btn btn-secondary">Reset Sample DB</button>
+              </div>
+
+              <div class="data-option-box danger-box">
+                <div>
+                  <h4>Wipe System Database</h4>
+                  <p>Permanently clear all stored records from localStorage.</p>
+                </div>
+                <button id="admin-wipe-db-btn" class="btn btn-danger">Wipe Database</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- MODALS -->
+
+  <!-- MODAL: ADD SAVINGS / CITY LEG GOAL -->
+  <div id="add-goal-modal" class="modal-overlay hidden">
+    <div class="modal-card glass-card">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-earth-europe"></i> Create European City Leg Allocation</h3>
+        <button class="icon-btn close-modal-btn" data-modal="add-goal-modal"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form id="add-goal-form" class="app-form">
+        <div class="form-group">
+          <label for="goal-name">City / Leg Name</label>
+          <input type="text" id="goal-name" placeholder="e.g. Paris & France Leg / Swiss Alps Leg" required>
+        </div>
+        <div class="form-group">
+          <label for="goal-target">Target Budget (₹)</label>
+          <input type="number" id="goal-target" min="1" step="0.01" placeholder="e.g. 450000" required>
+        </div>
+        <div class="form-group">
+          <label for="goal-saved">Current Allocated Fund (₹)</label>
+          <input type="number" id="goal-saved" min="0" step="0.01" placeholder="e.g. 350000" value="0" required>
+        </div>
+        <div class="form-group">
+          <label for="goal-date">Target Travel Date</label>
+          <input type="date" id="goal-date" required>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary close-modal-btn" data-modal="add-goal-modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save City Leg</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: DEPOSIT TO CITY LEG GOAL -->
+  <div id="deposit-modal" class="modal-overlay hidden">
+    <div class="modal-card glass-card">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-coins"></i> Deposit / Allocate to City Leg</h3>
+        <button class="icon-btn close-modal-btn" data-modal="deposit-modal"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form id="deposit-form" class="app-form">
+        <input type="hidden" id="deposit-goal-id">
+        <div class="form-group">
+          <label id="deposit-goal-title">City Leg: </label>
+          <input type="number" id="deposit-amount" min="1" step="0.01" placeholder="Enter deposit amount" required>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary close-modal-btn" data-modal="deposit-modal">Cancel</button>
+          <button type="submit" class="btn btn-success">Add Allocation</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: EDIT CATEGORY BUDGET -->
+  <div id="edit-budget-modal" class="modal-overlay hidden">
+    <div class="modal-card glass-card">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-pen-to-square"></i> Set Category Budget Limit</h3>
+        <button class="icon-btn close-modal-btn" data-modal="edit-budget-modal"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form id="edit-budget-form" class="app-form">
+        <input type="hidden" id="budget-category-key">
+        <div class="form-group">
+          <label for="budget-limit-input" id="budget-category-label">Category Limit</label>
+          <input type="number" id="budget-limit-input" min="0" step="1000" placeholder="e.g. 400000" required>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary close-modal-btn" data-modal="edit-budget-modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Update Limit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ADMIN CREATE NEW USER -->
+  <div id="admin-add-user-modal" class="modal-overlay hidden">
+    <div class="modal-card glass-card">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-user-plus"></i> Admin: Create Traveler Account</h3>
+        <button class="icon-btn close-modal-btn" data-modal="admin-add-user-modal"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form id="admin-add-user-form" class="app-form">
+        <div class="form-group">
+          <label for="new-user-name">Full Name</label>
+          <input type="text" id="new-user-name" placeholder="e.g. Sarah Connor" required>
+        </div>
+        <div class="form-group">
+          <label for="new-user-username">Username</label>
+          <input type="text" id="new-user-username" placeholder="e.g. sarah" required>
+        </div>
+        <div class="form-group">
+          <label for="new-user-password">Password</label>
+          <input type="password" id="new-user-password" placeholder="••••••••" required>
+        </div>
+        <div class="form-group">
+          <label for="new-user-role">Role</label>
+          <select id="new-user-role" class="form-select">
+            <option value="user">Traveler (Personal Planner)</option>
+            <option value="admin">Admin (System Oversight)</option>
+          </select>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary close-modal-btn" data-modal="admin-add-user-modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Create Account</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Custom JavaScript -->
+  <script src="script.js"></script>
+</body>
+</html>

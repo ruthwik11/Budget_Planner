@@ -1,0 +1,185 @@
+import { z } from 'zod';
+import { parseMoney } from '@/utils/money';
+
+/** Strips control characters and trims. React escapes on render; this keeps stored data clean. */
+const cleanText = (max: number) =>
+  z
+    .string()
+    .transform((s) => s.replace(/[\u0000-\u001F\u007F]/g, ' ').trim())
+    .pipe(z.string().max(max));
+
+const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Use YYYY-MM-DD');
+
+/** Form amount field: a string the user typed → positive minor units. */
+export const moneyInput = z
+  .string()
+  .min(1, 'Enter an amount')
+  .refine((v) => parseMoney(v) !== null, 'Enter a valid amount (max 2 decimals)')
+  .refine((v) => (parseMoney(v) ?? 0) > 0, 'Amount must be greater than zero')
+  .refine((v) => (parseMoney(v) ?? 0) <= 1e13, 'Amount is too large');
+
+// ───────────────────────── forms ─────────────────────────
+
+export const transactionForm = z
+  .object({
+    type: z.enum(['income', 'expense', 'transfer']),
+    title: cleanText(120).pipe(z.string().min(1, 'Add a description')),
+    amount: moneyInput,
+    date: isoDate,
+    categoryId: z.string().optional(),
+    accountId: z.string().min(1, 'Choose an account'),
+    toAccountId: z.string().optional(),
+    paymentMethod: z.enum(['card', 'upi', 'bank', 'cash', 'wallet', 'other']),
+    tags: z.string().max(200).optional(),
+    notes: cleanText(500).optional(),
+    repeat: z.enum(['none', 'daily', 'weekly', 'monthly', 'yearly']),
+  })
+  .superRefine((v, ctx) => {
+    if (v.type !== 'transfer' && !v.categoryId) ctx.addIssue({ code: 'custom', path: ['categoryId'], message: 'Pick a category' });
+    if (v.type === 'transfer') {
+      if (!v.toAccountId) ctx.addIssue({ code: 'custom', path: ['toAccountId'], message: 'Choose a destination' });
+      else if (v.toAccountId === v.accountId) ctx.addIssue({ code: 'custom', path: ['toAccountId'], message: 'Must differ from source' });
+      if (v.repeat !== 'none') ctx.addIssue({ code: 'custom', path: ['repeat'], message: 'Transfers can’t repeat yet' });
+    }
+  });
+export type TransactionFormValues = z.input<typeof transactionForm>;
+
+export const goalForm = z.object({
+  title: cleanText(80).pipe(z.string().min(1, 'Name your goal')),
+  target: moneyInput,
+  initial: z.string().refine((v) => v === '' || (parseMoney(v) ?? -1) >= 0, 'Invalid amount').optional(),
+  deadline: z.union([isoDate, z.literal('')]),
+  color: z.string().regex(/^#[0-9a-f]{6}$/i),
+  icon: z.string(),
+});
+export type GoalFormValues = z.input<typeof goalForm>;
+
+export const contributionForm = z.object({
+  amount: moneyInput,
+  direction: z.enum(['add', 'withdraw']),
+  date: isoDate,
+  note: cleanText(120).optional(),
+});
+export type ContributionFormValues = z.input<typeof contributionForm>;
+
+export const budgetForm = z.object({
+  categoryId: z.string().min(1, 'Pick a category'),
+  period: z.enum(['weekly', 'monthly', 'yearly']),
+  limit: moneyInput,
+  rollover: z.boolean(),
+});
+export type BudgetFormValues = z.input<typeof budgetForm>;
+
+export const recurringForm = z.object({
+  type: z.enum(['income', 'expense']),
+  title: cleanText(120).pipe(z.string().min(1, 'Add a name')),
+  amount: moneyInput,
+  categoryId: z.string().min(1, 'Pick a category'),
+  accountId: z.string().min(1, 'Choose an account'),
+  paymentMethod: z.enum(['card', 'upi', 'bank', 'cash', 'wallet', 'other']),
+  frequency: z.enum(['daily', 'weekly', 'monthly', 'yearly']),
+  interval: z.coerce.number().int().min(1).max(52),
+  startDate: isoDate,
+  endDate: z.union([isoDate, z.literal('')]),
+  autoPost: z.boolean(),
+});
+export type RecurringFormValues = z.input<typeof recurringForm>;
+
+export const categoryForm = z.object({
+  name: cleanText(40).pipe(z.string().min(1, 'Name the category')),
+  kind: z.enum(['income', 'expense']),
+  icon: z.string(),
+  color: z.string().regex(/^#[0-9a-f]{6}$/i),
+});
+export type CategoryFormValues = z.input<typeof categoryForm>;
+
+export const accountForm = z.object({
+  name: cleanText(40).pipe(z.string().min(1, 'Name the account')),
+  type: z.enum(['checking', 'savings', 'credit', 'cash', 'investment']),
+  opening: z.string().refine((v) => v === '' || parseMoney(v) !== null, 'Invalid amount'),
+  color: z.string().regex(/^#[0-9a-f]{6}$/i),
+});
+export type AccountFormValues = z.input<typeof accountForm>;
+
+export const userForm = z.object({
+  name: cleanText(60).pipe(z.string().min(2, 'Enter a full name')),
+  username: z
+    .string()
+    .trim()
+    .toLowerCase()
+    .regex(/^[a-z0-9_.-]{3,24}$/, '3–24 chars: letters, numbers, . _ -'),
+  role: z.enum(['user', 'admin']),
+});
+export type UserFormValues = z.input<typeof userForm>;
+
+export const profileForm = z.object({
+  name: cleanText(60).pipe(z.string().min(2, 'Enter your name')),
+});
+
+// ───────────────────────── persisted / imported data ─────────────────────────
+
+const minor = z.number().int().safe();
+const idStr = z.string().min(1).max(64);
+
+const userSchema = z.object({
+  id: idStr, name: cleanText(60), username: z.string().max(24), role: z.enum(['user', 'admin']),
+  status: z.enum(['active', 'suspended']), createdAt: isoDate,
+});
+const categorySchema = z.object({
+  id: idStr, userId: idStr, name: cleanText(40), kind: z.enum(['income', 'expense']), icon: z.string().max(32),
+  color: z.string().regex(/^#[0-9a-f]{6}$/i), archived: z.boolean().optional(),
+});
+const accountSchema = z.object({
+  id: idStr, userId: idStr, name: cleanText(40), type: z.enum(['checking', 'savings', 'credit', 'cash', 'investment']),
+  openingBalance: minor, color: z.string().regex(/^#[0-9a-f]{6}$/i), archived: z.boolean().optional(),
+});
+const txSchema = z.object({
+  id: idStr, userId: idStr, type: z.enum(['income', 'expense', 'transfer']), title: cleanText(120), amount: minor.nonnegative(),
+  date: isoDate, categoryId: idStr.nullable(), accountId: idStr, toAccountId: idStr.optional(),
+  paymentMethod: z.enum(['card', 'upi', 'bank', 'cash', 'wallet', 'other']), tags: z.array(cleanText(24)).max(12),
+  notes: cleanText(500).optional(), recurringId: idStr.optional(), createdAt: z.number(),
+});
+const budgetSchema = z.object({
+  id: idStr, userId: idStr, categoryId: idStr, period: z.enum(['weekly', 'monthly', 'yearly']), limit: minor.nonnegative(), rollover: z.boolean(),
+});
+const goalSchema = z.object({
+  id: idStr, userId: idStr, title: cleanText(80), target: minor.positive(), deadline: isoDate.nullable(),
+  color: z.string().regex(/^#[0-9a-f]{6}$/i), icon: z.string().max(32), createdAt: isoDate,
+  contributions: z.array(z.object({ id: idStr, date: isoDate, amount: minor, note: cleanText(120).optional() })).max(2000),
+});
+const recurringSchema = z.object({
+  id: idStr, userId: idStr, type: z.enum(['income', 'expense']), title: cleanText(120), amount: minor.positive(),
+  categoryId: idStr, accountId: idStr, paymentMethod: z.enum(['card', 'upi', 'bank', 'cash', 'wallet', 'other']),
+  frequency: z.enum(['daily', 'weekly', 'monthly', 'yearly']), interval: z.number().int().min(1).max(52),
+  startDate: isoDate, endDate: isoDate.nullable(), lastPosted: isoDate.nullable(), autoPost: z.boolean(), active: z.boolean(),
+});
+
+export const datasetSchema = z.object({
+  users: z.array(userSchema).max(500),
+  accounts: z.array(accountSchema).max(2000),
+  categories: z.array(categorySchema).max(5000),
+  transactions: z.array(txSchema).max(100_000),
+  budgets: z.array(budgetSchema).max(5000),
+  goals: z.array(goalSchema).max(1000),
+  recurring: z.array(recurringSchema).max(2000),
+  audit: z.array(z.object({ id: idStr, at: z.number(), action: cleanText(80), actor: cleanText(80), details: cleanText(400) })).max(5000),
+  policy: z.object({ defaults: z.record(z.string().max(40), minor.nonnegative()) }),
+});
+
+export const backupSchema = z.object({
+  app: z.literal('cadence'),
+  version: z.literal(1),
+  exportedAt: z.string(),
+  baseCurrency: z.enum(['INR', 'USD', 'EUR', 'GBP', 'AED', 'SGD']),
+  data: datasetSchema,
+});
+export type Backup = z.infer<typeof backupSchema>;
+
+/** One row of a transaction CSV import (headers matched case-insensitively). */
+export const csvRowSchema = z.object({
+  date: isoDate,
+  type: z.enum(['income', 'expense']),
+  title: cleanText(120).pipe(z.string().min(1)),
+  category: cleanText(40).pipe(z.string().min(1)),
+  amount: z.string().refine((v) => (parseMoney(v) ?? 0) > 0, 'Invalid amount'),
+});
