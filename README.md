@@ -12,6 +12,15 @@ npm run build
 
 Sign in by picking a demo profile (**Alex** or **Sarah**, personal) or **System Admin**. There are no passwords. Profiles are demo identities, and the admin role is a frontend demonstration, not access control.
 
+## Modules (v2)
+
+- **Debts & EMIs** (`/debts`): loans, EMIs and card balances; payments split into interest and principal; avalanche or snowball payoff plans with an extra-payment slider; debt-free date, interest saved, debt-to-income ratio, amortization schedules.
+- **Split** (`/split`): groups, shared expenses split equally, by exact amounts or by percentage (shares always sum exactly), balances, and settle-up in the fewest transfers.
+- **Tax planner** (`/tax`): India's new vs old regime on your real income (FY 2025-26 slabs, §87A rebate with marginal relief, 4% cess), deduction caps, break-even insight, ledger hints for 80D. Estimates only.
+- **What-if** (`/what-if`): change income, add costs, trim categories, model a big purchase or a job gap, and see a 24-month projection plus how goal dates shift.
+
+All of their maths lives in `src/lib/{debts,split,tax,simulate}.ts`, covered by `src/lib/modules.test.ts`.
+
 ## Stack
 
 React 19 · TypeScript · Vite 6 · Tailwind CSS 4 · Framer Motion 12 · GSAP 3 (ScrollTrigger, SplitText) · Lenis · Zustand 5 · React Router 7 · Recharts 2 · React Hook Form + Zod · Lucide.
@@ -54,6 +63,8 @@ All amounts are **integer minor units** (paise/cents). User input is parsed as a
 - **One container** (`Panel`): 1px hairline, 14px radius, a faint top light, and a mono eyebrow over the title. Hierarchy comes from type and spacing, not from nesting cards inside cards.
 
 ## Motion
+
+**v2 layer** (`src/components/fx/`): film-cut route transitions (band panel + page title in display serif), editorial kinetic headlines, colour-block bands over a WebGL liquid shader (`LiquidCanvas`, no 3D library), a cursor follower, pointer spotlight on panels, 3D tilt on cards, a velocity-reactive word marquee. Film cuts and the cursor can be turned off in Settings; everything respects reduced motion.
 
 The motion language comes from a runtime study of ttm.supply. See [`docs/TTM_MOTION_ANALYSIS.md`](docs/TTM_MOTION_ANALYSIS.md) for what was observed, what was inferred, and how each idea was translated. In brief:
 

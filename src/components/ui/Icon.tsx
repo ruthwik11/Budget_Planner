@@ -1,7 +1,8 @@
 import {
   Baby, Book, Briefcase, Building2, Car, Coffee, Coins, Dumbbell, Film, Gift, Globe, GraduationCap, HeartPulse, Hotel,
   House, Landmark, Laptop, Mountain, Music, PawPrint, PiggyBank, Plane, Receipt, Shield, Shirt, ShoppingBag, Smartphone,
-  Sparkles, Tag, Target, Ticket, TrainFront, TrendingUp, Utensils, Wallet, Wifi, Wrench, Zap, type LucideIcon,
+  Sparkles, Tag, Target, Ticket, TrainFront, TrendingUp, Utensils, Wallet, Wifi, Wrench, Zap, Users, CreditCard, Percent, Calculator,
+  type LucideIcon,
 } from 'lucide-react';
 import type { IconName } from '@/types';
 import { cn } from '@/utils/cn';
@@ -12,7 +13,8 @@ export const ICONS: Record<IconName, LucideIcon> = {
   'paw-print': PawPrint, baby: Baby, briefcase: Briefcase, laptop: Laptop, 'trending-up': TrendingUp, building: Building2,
   landmark: Landmark, coins: Coins, 'piggy-bank': PiggyBank, wallet: Wallet, receipt: Receipt, ticket: Ticket, hotel: Hotel,
   train: TrainFront, globe: Globe, mountain: Mountain, sparkles: Sparkles, target: Target, tag: Tag, smartphone: Smartphone,
-  shirt: Shirt, wrench: Wrench, book: Book, music: Music,
+  shirt: Shirt, wrench: Wrench, book: Book, music: Music, users: Users, 'credit-card': CreditCard, percent: Percent,
+  calculator: Calculator,
 };
 export const ICON_NAMES = Object.keys(ICONS) as IconName[];
 

@@ -148,7 +148,8 @@ export type IconName =
   | 'graduation-cap' | 'gift' | 'shield' | 'wifi' | 'coffee' | 'dumbbell' | 'paw-print'
   | 'baby' | 'briefcase' | 'laptop' | 'trending-up' | 'building' | 'landmark' | 'coins'
   | 'piggy-bank' | 'wallet' | 'receipt' | 'ticket' | 'hotel' | 'train' | 'globe' | 'mountain'
-  | 'sparkles' | 'target' | 'tag' | 'smartphone' | 'shirt' | 'wrench' | 'book' | 'music';
+  | 'sparkles' | 'target' | 'tag' | 'smartphone' | 'shirt' | 'wrench' | 'book' | 'music'
+  | 'users' | 'credit-card' | 'percent' | 'calculator';
 
 export interface Dataset {
   users: User[];
@@ -160,6 +161,97 @@ export interface Dataset {
   recurring: Recurring[];
   audit: AuditLog[];
   policy: BudgetPolicy;
+  debts: Debt[];
+  splitGroups: SplitGroup[];
+  taxProfiles: TaxProfile[];
+}
+
+// ───────────────────────── debts ─────────────────────────
+
+export type DebtKind = 'home' | 'vehicle' | 'education' | 'personal' | 'credit-card' | 'other';
+
+export interface DebtPayment {
+  id: string;
+  date: ISODate;
+  amount: Minor;
+  interest: Minor; // portion that went to interest
+  principal: Minor; // portion that reduced the balance
+}
+
+export interface Debt {
+  id: string;
+  userId: string;
+  name: string;
+  lender: string;
+  kind: DebtKind;
+  /** Amount originally borrowed (for progress). */
+  original: Minor;
+  /** Outstanding balance before any payment recorded in `payments`. */
+  opening: Minor;
+  /** Annual interest rate in basis points (9.25% → 925). */
+  aprBps: number;
+  /** Monthly EMI / minimum payment. */
+  payment: Minor;
+  dueDay: number; // 1–28
+  startDate: ISODate;
+  color: string;
+  payments: DebtPayment[];
+}
+
+// ───────────────────────── split expenses ─────────────────────────
+
+export interface SplitMember {
+  id: string; // 'me' is the signed-in user
+  name: string;
+}
+
+export type SplitMode = 'equal' | 'exact' | 'percent';
+
+export interface SplitExpense {
+  id: string;
+  title: string;
+  amount: Minor;
+  date: ISODate;
+  paidBy: string; // member id
+  mode: SplitMode;
+  /** member id → minor units (exact) or basis points (percent). Members absent from `shares` are excluded (equal uses keys). */
+  shares: Record<string, number>;
+}
+
+export interface SplitSettlement {
+  id: string;
+  date: ISODate;
+  from: string;
+  to: string;
+  amount: Minor;
+}
+
+export interface SplitGroup {
+  id: string;
+  userId: string;
+  name: string;
+  icon: IconName;
+  color: string;
+  members: SplitMember[];
+  expenses: SplitExpense[];
+  settlements: SplitSettlement[];
+  createdAt: ISODate;
+}
+
+// ───────────────────────── tax ─────────────────────────
+
+export type TaxRegime = 'new' | 'old';
+
+export interface TaxProfile {
+  userId: string;
+  /** Annual gross salary/income estimate override; null → derived from last 12 months of income. */
+  grossOverride: Minor | null;
+  sec80C: Minor;
+  sec80D: Minor;
+  sec80CCD1B: Minor;
+  homeLoanInterest: Minor;
+  hraExemption: Minor;
+  otherDeductions: Minor;
 }
 
 export interface DateRange {

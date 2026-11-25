@@ -34,6 +34,8 @@ interface PrefsState {
   dateFormat: DateFormat;
   reduceMotion: 'system' | 'on' | 'off';
   smoothScroll: boolean;
+  filmTransitions: boolean;
+  customCursor: boolean;
   hideAmounts: boolean;
   notifications: NotificationPrefs;
   dashboardOrder: WidgetId[];
@@ -58,6 +60,8 @@ export const usePrefs = create<PrefsState>()(
       dateFormat: 'DD MMM YYYY',
       reduceMotion: 'system',
       smoothScroll: true,
+      filmTransitions: true,
+      customCursor: true,
       hideAmounts: false,
       notifications: { budget: true, overspend: true, goals: true, upcoming: true, summary: true, transactions: true },
       dashboardOrder: DEFAULT_ORDER,

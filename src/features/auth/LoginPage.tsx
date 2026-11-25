@@ -5,6 +5,8 @@ import { ArrowRight, Info, ShieldCheck } from 'lucide-react';
 import { gsap } from '@/components/animations/gsap';
 import { SplitReveal } from '@/components/animations/Motion';
 import { Glyph, Wordmark } from '@/components/layout/Wordmark';
+import { LiquidCanvas } from '@/components/fx/LiquidCanvas';
+import { KineticTitle } from '@/components/fx/Editorial';
 import { CategoryGlyph } from '@/components/ui/Icon';
 import { Badge } from '@/components/ui/Controls';
 import { Input } from '@/components/ui/Field';
@@ -109,7 +111,8 @@ export default function LoginPage() {
   return (
     <div className="grain relative grid min-h-dvh lg:grid-cols-[1.15fr_1fr]">
       {/* brand side */}
-      <section className="relative hidden overflow-hidden border-r border-line lg:block" style={{ background: 'var(--glow), var(--bg-sunken)' }}>
+      <section className="on-band relative isolate hidden overflow-hidden bg-band lg:block">
+        <LiquidCanvas className="-z-10" />
         <div className="absolute left-10 top-8 z-10">
           <Wordmark size={20} />
         </div>
@@ -131,10 +134,8 @@ export default function LoginPage() {
           </div>
         </div>
         <div className="absolute bottom-10 left-10 z-10 max-w-md">
-          <SplitReveal as="h1" delay={0.4} className="text-[3.4rem] font-medium leading-[0.98] tracking-[-0.045em]">
-            Money, in rhythm.
-          </SplitReveal>
-          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1, duration: 0.8 }} className="mt-4 max-w-sm text-sm text-fg-3">
+          <KineticTitle delay={0.4} className="text-[clamp(4.2rem,7vw,7rem)]">Money, in rhythm.</KineticTitle>
+          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1, duration: 0.8 }} className="mt-5 max-w-sm text-[0.95rem] text-fg-2">
             Budgets that breathe with your month. Goals that show their pace. A ledger you can actually read.
           </motion.p>
         </div>

@@ -120,7 +120,7 @@ export function PageTransition({ children }: { children: ReactNode }) {
     <motion.div
       initial={{ opacity: 0, y: 14, filter: 'blur(5px)' }}
       animate={{ opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 0.5, ease: EASE.outQuint } }}
-      exit={{ opacity: 0, y: -6, filter: 'blur(3px)', transition: { duration: 0.18, ease: EASE.inOut } }}
+      exit={{ opacity: 0, y: -6, filter: 'blur(3px)', transition: { duration: 0.34, ease: EASE.inOut } }}
       onAnimationComplete={() => ScrollTrigger.refresh()}
     >
       {children}

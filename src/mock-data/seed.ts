@@ -4,8 +4,9 @@
  * assumption of the app — users can switch datasets or wipe everything.
  */
 import type {
-  Account, AuditLog, Budget, Category, CategoryKind, Dataset, Goal, IconName, Recurring, Transaction, User,
+  Account, AuditLog, Budget, Category, CategoryKind, Dataset, Debt, Goal, IconName, Recurring, SplitGroup, TaxProfile, Transaction, User,
 } from '@/types';
+import { monthlyInterest } from '@/lib/debts';
 import { addDays, addMonths, startOfMonth, todayISO } from '@/utils/dates';
 import { CATEGORY_PALETTE } from '@/constants/palette';
 import type { CurrencyCode } from '@/utils/money';
@@ -303,6 +304,92 @@ function europeFor(user: User, scale: number) {
   return { cats, accounts, recurring: [] as Recurring[], txs, budgets, goals };
 }
 
+// ───────────────────────── v2 modules: debts, split groups, tax ─────────────────────────
+
+function extrasFor(user: User, scale: number, which: DatasetId): { debts: Debt[]; groups: SplitGroup[]; tax: TaxProfile } {
+  const today = todayISO();
+  const mkDebt = (name: string, lender: string, kind: Debt['kind'], original: number, opening: number, apr: number, payment: number, dueDay: number, color: string, monthsPaid: number): Debt => {
+    let bal = rupees(opening * scale);
+    const pay = rupees(payment * scale);
+    const start = addMonths(startOfMonth(today), -monthsPaid, 1);
+    const payments = Array.from({ length: monthsPaid }, (_, i) => {
+      const date = addDays(addMonths(start, i + 1, 1), dueDay - 1);
+      const interest = Math.min(pay, monthlyInterest(bal, apr));
+      const principal = Math.min(bal, pay - interest);
+      bal -= principal;
+      return { id: id('dp'), date, amount: pay, interest, principal };
+    }).filter((p) => p.date <= today);
+    return {
+      id: id('debt'), userId: user.id, name, lender, kind, original: rupees(original * scale), opening: rupees(opening * scale), aprBps: apr,
+      payment: pay, dueDay, startDate: start, color, payments,
+    };
+  };
+  const debts =
+    which === 'europe-trip'
+      ? [mkDebt('Travel personal loan', 'Bajaj Finserv', 'personal', 300000, 300000, 1450, 14200, 7, '#d9734e', 2)]
+      : [
+          mkDebt('Car loan · Nexon EV', 'HDFC Bank', 'vehicle', 900000, 620000, 925, 18700, 5, '#4c9db0', 6),
+          mkDebt('Education loan', 'SBI', 'education', 600000, 310000, 850, 7400, 10, '#7fa779', 6),
+          mkDebt('Credit card revolve', 'Amex', 'credit-card', 52000, 52000, 4200, 3500, 18, '#d9734e', 3),
+          mkDebt('Phone EMI · Pixel', 'Bajaj Finserv', 'personal', 64000, 38000, 1600, 5600, 2, '#9a7aa8', 4),
+        ];
+  const me = { id: 'me', name: user.name.split(' ')[0] };
+  const d = (n: number) => addDays(today, -n);
+  const R = (n: number) => rupees(Math.round(n * scale));
+  const groups: SplitGroup[] =
+    which === 'europe-trip'
+      ? [{
+          id: id('grp'), userId: user.id, name: 'Europe crew', icon: 'globe', color: '#4c9db0', createdAt: d(40),
+          members: [me, { id: 'm1', name: 'Riya' }, { id: 'm2', name: 'Kabir' }],
+          expenses: [
+            { id: id('se'), title: 'Interlaken chalet deposit', amount: R(48000), date: d(30), paidBy: 'me', mode: 'equal', shares: {} },
+            { id: id('se'), title: 'Seine cruise tickets', amount: R(14400), date: d(20), paidBy: 'm1', mode: 'equal', shares: {} },
+          ],
+          settlements: [],
+        }]
+      : [
+          {
+            id: id('grp'), userId: user.id, name: 'Goa long weekend', icon: 'mountain', color: '#e0a93b', createdAt: d(160),
+            members: [me, { id: 'm1', name: 'Riya' }, { id: 'm2', name: 'Kabir' }, { id: 'm3', name: 'Ananya' }],
+            expenses: [
+              { id: id('se'), title: 'Villa in Assagao', amount: R(36000), date: d(150), paidBy: 'me', mode: 'equal', shares: {} },
+              { id: id('se'), title: 'Seafood dinner at Fisherman’s Wharf', amount: R(8400), date: d(149), paidBy: 'm1', mode: 'equal', shares: {} },
+              { id: id('se'), title: 'Scooter rentals', amount: R(3600), date: d(149), paidBy: 'm2', mode: 'equal', shares: {} },
+              { id: id('se'), title: 'Cabs to the airport', amount: R(2400), date: d(147), paidBy: 'm3', mode: 'percent', shares: { me: 2500, m1: 2500, m2: 2500, m3: 2500 } },
+            ],
+            settlements: [{ id: id('st'), date: d(140), from: 'm2', to: 'me', amount: R(6000) }],
+          },
+          {
+            id: id('grp'), userId: user.id, name: 'Flat 4B · utilities', icon: 'home', color: '#4c9db0', createdAt: d(60),
+            members: [me, { id: 'm4', name: 'Dev' }],
+            expenses: [
+              { id: id('se'), title: 'Electricity · October', amount: R(3200), date: d(35), paidBy: 'me', mode: 'equal', shares: {} },
+              { id: id('se'), title: 'Wi-Fi + Netflix', amount: R(1648), date: d(20), paidBy: 'm4', mode: 'equal', shares: {} },
+              { id: id('se'), title: 'Deep cleaning', amount: R(2500), date: d(9), paidBy: 'me', mode: 'exact', shares: { me: R(1000), m4: R(1500) } },
+            ],
+            settlements: [],
+          },
+        ];
+  const tax: TaxProfile = {
+    userId: user.id, grossOverride: null, sec80C: R(110000), sec80D: R(18500), sec80CCD1B: 0,
+    homeLoanInterest: 0, hraExemption: 0, otherDeductions: 0,
+  };
+  return { debts, groups, tax };
+}
+
+/** Module demo data for workspaces saved before debts/split/tax existed. */
+export function backfillExtras(users: User[], which: DatasetId) {
+  const out = { debts: [] as Debt[], splitGroups: [] as SplitGroup[], taxProfiles: [] as TaxProfile[] };
+  if (which === 'empty') return out;
+  users.filter((u) => u.role === 'user' && u.id.startsWith('usr_')).forEach((u) => {
+    const x = extrasFor(u, u.id === 'usr_alex' ? 1 : 0.72, which);
+    out.debts.push(...x.debts);
+    out.splitGroups.push(...x.groups);
+    out.taxProfiles.push(x.tax);
+  });
+  return out;
+}
+
 // ───────────────────────── public ─────────────────────────
 
 export function buildDataset(which: DatasetId): Dataset {
@@ -311,7 +398,7 @@ export function buildDataset(which: DatasetId): Dataset {
   const users = DEMO_USERS(today);
   const out: Dataset = {
     users, accounts: [], categories: [], transactions: [], budgets: [], goals: [], recurring: [],
-    audit: [] as AuditLog[], policy: { defaults: POLICY_DEFAULTS },
+    audit: [] as AuditLog[], policy: { defaults: POLICY_DEFAULTS }, debts: [], splitGroups: [], taxProfiles: [],
   };
   const parts = users
     .filter((u) => u.role === 'user')
@@ -334,6 +421,13 @@ export function buildDataset(which: DatasetId): Dataset {
     out.goals.push(...p.goals);
     out.recurring.push(...p.recurring);
   }
+  if (which !== 'empty')
+    users.filter((u) => u.role === 'user').forEach((u, i) => {
+      const x = extrasFor(u, i === 0 ? 1 : 0.72, which);
+      out.debts.push(...x.debts);
+      out.splitGroups.push(...x.groups);
+      out.taxProfiles.push(x.tax);
+    });
   out.audit.push({ id: id('log'), at: Date.now(), action: 'Dataset loaded', actor: 'System', details: `Loaded “${DATASETS.find((d) => d.id === which)?.name}” demo data.` });
   return out;
 }

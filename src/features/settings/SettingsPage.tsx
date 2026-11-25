@@ -117,6 +117,12 @@ export default function SettingsPage() {
           <Row label="Smooth scrolling" hint="Inertial wheel scrolling (touch stays native).">
             <div className="flex justify-end"><Switch checked={prefs.smoothScroll} onChange={(v) => prefs.set({ smoothScroll: v })} label="Smooth scrolling" /></div>
           </Row>
+          <Row label="Film transitions" hint="Page changes play as a short cut with the page title.">
+            <div className="flex justify-end"><Switch checked={prefs.filmTransitions} onChange={(v) => prefs.set({ filmTransitions: v })} label="Film transitions" /></div>
+          </Row>
+          <Row label="Custom cursor" hint="A trailing ring that reacts to buttons and cards (mouse only).">
+            <div className="flex justify-end"><Switch checked={prefs.customCursor} onChange={(v) => prefs.set({ customCursor: v })} label="Custom cursor" /></div>
+          </Row>
           <Row label="Hide amounts" hint="Masks figures for screen sharing. Shortcut: eye icon in the top bar.">
             <div className="flex justify-end"><Switch checked={prefs.hideAmounts} onChange={(v) => prefs.set({ hideAmounts: v })} label="Hide amounts" /></div>
           </Row>

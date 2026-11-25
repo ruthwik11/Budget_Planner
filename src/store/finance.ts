@@ -1,8 +1,11 @@
 import { create } from 'zustand';
 import type {
-  Account, AppNotification, Budget, Category, Dataset, Goal, GoalContribution, Recurring, Transaction, User,
+  Account, AppNotification, Budget, Category, Dataset, Debt, Goal, GoalContribution, Recurring, SplitExpense, SplitGroup,
+  SplitSettlement, TaxProfile, Transaction, User,
 } from '@/types';
-import { buildDataset, defaultCategoriesFor, type DatasetId } from '@/mock-data/seed';
+import { splitPayment } from '@/lib/debts';
+import { CATEGORY_PALETTE } from '@/constants/palette';
+import { backfillExtras, buildDataset, defaultCategoriesFor, type DatasetId } from '@/mock-data/seed';
 import { localRepository, purgeLegacyStorage, sessionRepository, type StoredWorkspace } from '@/services/repository';
 import { dueOccurrences, nextOccurrence } from '@/lib/finance';
 import { addDays, todayISO } from '@/utils/dates';
@@ -68,6 +71,25 @@ export interface FinanceState extends Dataset {
   clearAudit: () => void;
   updatePolicy: (defaults: Record<string, number>) => void;
 
+  // debts
+  addDebt: (d: Omit<Debt, 'id' | 'userId' | 'payments'>) => Debt;
+  updateDebt: (id: string, patch: Partial<Debt>) => void;
+  deleteDebt: (id: string) => void;
+  /** Splits the payment into interest + principal; with an account, also logs it as an expense. */
+  payDebt: (id: string, p: { amount: number; date: string; accountId?: string }) => { interest: number; principal: number };
+  removeDebtPayment: (debtId: string, paymentId: string) => void;
+
+  // split expenses
+  addGroup: (g: Omit<SplitGroup, 'id' | 'userId' | 'expenses' | 'settlements' | 'createdAt'>) => SplitGroup;
+  updateGroup: (id: string, patch: Partial<SplitGroup>) => void;
+  deleteGroup: (id: string) => void;
+  addSplitExpense: (groupId: string, e: Omit<SplitExpense, 'id'>) => void;
+  deleteSplitExpense: (groupId: string, expenseId: string) => void;
+  settle: (groupId: string, s: Omit<SplitSettlement, 'id'>) => void;
+
+  // tax
+  saveTaxProfile: (p: Omit<TaxProfile, 'userId'>) => void;
+
   // data
   loadDataset: (id: DatasetId) => void;
   wipeAll: () => void;
@@ -75,12 +97,19 @@ export interface FinanceState extends Dataset {
   pushEvent: (n: Omit<AppNotification, 'id' | 'at'>) => void;
 }
 
-const DATA_KEYS: (keyof Dataset)[] = ['users', 'accounts', 'categories', 'transactions', 'budgets', 'goals', 'recurring', 'audit', 'policy'];
+const DATA_KEYS: (keyof Dataset)[] = [
+  'users', 'accounts', 'categories', 'transactions', 'budgets', 'goals', 'recurring', 'audit', 'policy', 'debts', 'splitGroups', 'taxProfiles',
+];
 
 function initial(): Pick<FinanceState, keyof Dataset | 'baseCurrency' | 'datasetId'> {
   purgeLegacyStorage();
   const stored = localRepository.load();
-  if (stored) return { ...stored.data, baseCurrency: stored.baseCurrency, datasetId: stored.datasetId };
+  if (stored) {
+    const d = stored.data;
+    const pristine = !d.debts.length && !d.splitGroups.length && !d.taxProfiles.length;
+    const extras = pristine ? backfillExtras(d.users, stored.datasetId) : {};
+    return { ...d, ...extras, baseCurrency: stored.baseCurrency, datasetId: stored.datasetId };
+  }
   return { ...buildDataset('personal'), baseCurrency: 'INR', datasetId: 'personal' };
 }
 
@@ -306,6 +335,7 @@ export const useFinance = create<FinanceState>()((set, get) => {
         return {
           users: s.users.filter((x) => x.id !== userId), transactions: keep(s.transactions), accounts: keep(s.accounts),
           categories: keep(s.categories), budgets: keep(s.budgets), goals: keep(s.goals), recurring: keep(s.recurring),
+          debts: keep(s.debts), splitGroups: keep(s.splitGroups), taxProfiles: keep(s.taxProfiles),
         };
       });
       log('User deleted', `Deleted profile “${u.username}” and all of its records.`);
@@ -345,6 +375,63 @@ export const useFinance = create<FinanceState>()((set, get) => {
       }
       log('Backup restored', `Restored backup exported ${b.exportedAt}.`);
     },
+    addDebt(d) {
+      const debt: Debt = { ...d, id: uid('debt'), userId: uidOrThrow(), payments: [] };
+      set((s) => ({ debts: [...s.debts, debt] }));
+      return debt;
+    },
+    updateDebt(id, patch) {
+      set((s) => ({ debts: s.debts.map((d) => (d.id === id ? { ...d, ...patch } : d)) }));
+    },
+    deleteDebt(id) {
+      set((s) => ({ debts: s.debts.filter((d) => d.id !== id) }));
+    },
+    payDebt(id, p) {
+      const d = get().debts.find((x) => x.id === id);
+      if (!d) return { interest: 0, principal: 0 };
+      const parts = splitPayment(d, p.amount);
+      get().updateDebt(id, { payments: [...d.payments, { id: uid('dp'), date: p.date, amount: p.amount, ...parts }] });
+      if (p.accountId) {
+        // log the payment in the ledger under "Debt payments" (created on first use)
+        let cat = get().categories.find((c) => c.userId === d.userId && c.kind === 'expense' && c.name === 'Debt payments');
+        if (!cat) cat = get().addCategory({ name: 'Debt payments', kind: 'expense', icon: 'landmark', color: CATEGORY_PALETTE[3] });
+        get().addTransaction({
+          type: 'expense', title: `${d.name} payment`, amount: p.amount, date: p.date, categoryId: cat.id, accountId: p.accountId,
+          paymentMethod: 'bank', tags: ['debt'],
+        });
+      }
+      return parts;
+    },
+    removeDebtPayment(debtId, paymentId) {
+      set((s) => ({ debts: s.debts.map((d) => (d.id === debtId ? { ...d, payments: d.payments.filter((p) => p.id !== paymentId) } : d)) }));
+    },
+
+    addGroup(g) {
+      const grp: SplitGroup = { ...g, id: uid('grp'), userId: uidOrThrow(), expenses: [], settlements: [], createdAt: todayISO() };
+      set((s) => ({ splitGroups: [...s.splitGroups, grp] }));
+      return grp;
+    },
+    updateGroup(id, patch) {
+      set((s) => ({ splitGroups: s.splitGroups.map((g) => (g.id === id ? { ...g, ...patch } : g)) }));
+    },
+    deleteGroup(id) {
+      set((s) => ({ splitGroups: s.splitGroups.filter((g) => g.id !== id) }));
+    },
+    addSplitExpense(groupId, e) {
+      set((s) => ({ splitGroups: s.splitGroups.map((g) => (g.id === groupId ? { ...g, expenses: [{ ...e, id: uid('se') }, ...g.expenses] } : g)) }));
+    },
+    deleteSplitExpense(groupId, expenseId) {
+      set((s) => ({ splitGroups: s.splitGroups.map((g) => (g.id === groupId ? { ...g, expenses: g.expenses.filter((e) => e.id !== expenseId) } : g)) }));
+    },
+    settle(groupId, st) {
+      set((s) => ({ splitGroups: s.splitGroups.map((g) => (g.id === groupId ? { ...g, settlements: [{ ...st, id: uid('st') }, ...g.settlements] } : g)) }));
+    },
+
+    saveTaxProfile(p) {
+      const userId = uidOrThrow();
+      set((s) => ({ taxProfiles: [...s.taxProfiles.filter((t) => t.userId !== userId), { ...p, userId }] }));
+    },
+
     pushEvent(n) {
       set((s) => ({ events: [{ ...n, id: uid('evt'), at: Date.now() }, ...s.events].slice(0, 50) }));
     },

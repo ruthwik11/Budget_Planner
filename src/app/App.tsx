@@ -5,6 +5,8 @@ import { AppShell } from '@/components/layout/AppShell';
 import { CommandPalette } from '@/components/layout/CommandPalette';
 import { Toaster } from '@/components/ui/Toaster';
 import { CurtainIntro, PageTransition, SmoothScroll } from '@/components/animations/Cinematic';
+import { FilmTransition } from '@/components/fx/Editorial';
+import { Cursor } from '@/components/fx/Interactions';
 import { TransactionEditor } from '@/features/transactions/TransactionEditor';
 import { TransactionDetail } from '@/features/transactions/TransactionDetail';
 import { NotificationsPanel } from '@/features/notifications/NotificationsPanel';
@@ -25,6 +27,10 @@ const Goals = lazy(() => import('@/features/savings/GoalsPage'));
 const Recurring = lazy(() => import('@/features/recurring/RecurringPage'));
 const Analytics = lazy(() => import('@/features/analytics/AnalyticsPage'));
 const Reports = lazy(() => import('@/features/reports/ReportsPage'));
+const Debts = lazy(() => import('@/features/debts/DebtsPage'));
+const Split = lazy(() => import('@/features/split/SplitPage'));
+const Tax = lazy(() => import('@/features/tax/TaxPage'));
+const WhatIf = lazy(() => import('@/features/whatif/WhatIfPage'));
 const Settings = lazy(() => import('@/features/settings/SettingsPage'));
 const AdminOverview = lazy(() => import('@/features/admin/AdminOverview'));
 const AdminUsers = lazy(() => import('@/features/admin/AdminUsers'));
@@ -113,6 +119,7 @@ function RequireRole({ role }: { role: 'user' | 'admin' }) {
   return (
     <>
       {!introPlayed && <CurtainIntro onDone={setIntroPlayed} />}
+      <FilmTransition />
       <AppShell>
         <ErrorBoundary>
           <AnimatePresence mode="wait" initial={false}>
@@ -159,6 +166,10 @@ function AppRoutes() {
         <Route path="recurring" element={<Recurring />} />
         <Route path="analytics" element={<Analytics />} />
         <Route path="reports" element={<Reports />} />
+        <Route path="debts" element={<Debts />} />
+        <Route path="split" element={<Split />} />
+        <Route path="tax" element={<Tax />} />
+        <Route path="what-if" element={<WhatIf />} />
         <Route path="settings" element={<Settings />} />
       </Route>
       <Route path="admin" element={<RequireRole role="admin" />}>
@@ -177,10 +188,12 @@ function AppRoutes() {
 export default function App() {
   useEnvironment();
   const reduced = useReducedMotion();
+  const customCursor = usePrefs((s) => s.customCursor);
   return (
     <MotionConfig reducedMotion={reduced ? 'always' : 'never'}>
       <BrowserRouter>
         <SmoothScroll />
+        {customCursor && <Cursor />}
         <AppRoutes />
         <Toaster />
       </BrowserRouter>

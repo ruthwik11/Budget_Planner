@@ -154,6 +154,28 @@ const recurringSchema = z.object({
   startDate: isoDate, endDate: isoDate.nullable(), lastPosted: isoDate.nullable(), autoPost: z.boolean(), active: z.boolean(),
 });
 
+const hex = z.string().regex(/^#[0-9a-f]{6}$/i);
+const debtSchema = z.object({
+  id: idStr, userId: idStr, name: cleanText(60), lender: cleanText(60),
+  kind: z.enum(['home', 'vehicle', 'education', 'personal', 'credit-card', 'other']),
+  original: minor.nonnegative(), opening: minor.nonnegative(), aprBps: z.number().int().min(0).max(10000),
+  payment: minor.positive(), dueDay: z.number().int().min(1).max(28), startDate: isoDate, color: hex,
+  payments: z.array(z.object({ id: idStr, date: isoDate, amount: minor.nonnegative(), interest: minor.nonnegative(), principal: minor.nonnegative() })).max(2000),
+});
+const splitGroupSchema = z.object({
+  id: idStr, userId: idStr, name: cleanText(60), icon: z.string().max(32), color: hex, createdAt: isoDate,
+  members: z.array(z.object({ id: idStr, name: cleanText(40) })).min(1).max(30),
+  expenses: z.array(z.object({
+    id: idStr, title: cleanText(80), amount: minor.positive(), date: isoDate, paidBy: idStr,
+    mode: z.enum(['equal', 'exact', 'percent']), shares: z.record(idStr, z.number().int().nonnegative()),
+  })).max(5000),
+  settlements: z.array(z.object({ id: idStr, date: isoDate, from: idStr, to: idStr, amount: minor.positive() })).max(5000),
+});
+const taxProfileSchema = z.object({
+  userId: idStr, grossOverride: minor.nonnegative().nullable(), sec80C: minor.nonnegative(), sec80D: minor.nonnegative(),
+  sec80CCD1B: minor.nonnegative(), homeLoanInterest: minor.nonnegative(), hraExemption: minor.nonnegative(), otherDeductions: minor.nonnegative(),
+});
+
 export const datasetSchema = z.object({
   users: z.array(userSchema).max(500),
   accounts: z.array(accountSchema).max(2000),
@@ -164,6 +186,10 @@ export const datasetSchema = z.object({
   recurring: z.array(recurringSchema).max(2000),
   audit: z.array(z.object({ id: idStr, at: z.number(), action: cleanText(80), actor: cleanText(80), details: cleanText(400) })).max(5000),
   policy: z.object({ defaults: z.record(z.string().max(40), minor.nonnegative()) }),
+  // added in v2: older saved workspaces simply start with none
+  debts: z.array(debtSchema).max(500).default([]),
+  splitGroups: z.array(splitGroupSchema).max(200).default([]),
+  taxProfiles: z.array(taxProfileSchema).max(500).default([]),
 });
 
 export const backupSchema = z.object({
@@ -183,3 +209,24 @@ export const csvRowSchema = z.object({
   category: cleanText(40).pipe(z.string().min(1)),
   amount: z.string().refine((v) => (parseMoney(v) ?? 0) > 0, 'Invalid amount'),
 });
+
+// ───────────────────────── v2 module forms ─────────────────────────
+
+export const debtForm = z.object({
+  name: cleanText(60).pipe(z.string().min(1, 'Name this debt')),
+  lender: cleanText(60),
+  kind: z.enum(['home', 'vehicle', 'education', 'personal', 'credit-card', 'other']),
+  balance: moneyInput,
+  original: z.string().refine((v) => v === '' || (parseMoney(v) ?? -1) >= 0, 'Invalid amount'),
+  apr: z.string().refine((v) => /^\d{1,2}(\.\d{1,2})?$/.test(v.trim()) && Number(v) <= 60, 'Rate between 0 and 60%'),
+  payment: moneyInput,
+  dueDay: z.coerce.number().int().min(1, '1–28').max(28, '1–28'),
+  color: z.string().regex(/^#[0-9a-f]{6}$/i),
+});
+export type DebtFormValues = z.input<typeof debtForm>;
+
+export const groupForm = z.object({
+  name: cleanText(60).pipe(z.string().min(1, 'Name the group')),
+  members: z.string().refine((v) => v.split(',').map((x) => x.trim()).filter(Boolean).length >= 1, 'Add at least one other person'),
+});
+export type GroupFormValues = z.input<typeof groupForm>;

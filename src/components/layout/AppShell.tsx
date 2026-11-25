@@ -13,6 +13,7 @@ import { useFinance } from '@/store/finance';
 import { usePrefs } from '@/store/prefs';
 import { useUI } from '@/store/ui';
 import { useMagnetic } from '@/components/animations/Motion';
+import { useSpotlight } from '@/components/fx/Interactions';
 import { cn } from '@/utils/cn';
 import { EASE, SPRING } from '@/constants/motion';
 
@@ -335,6 +336,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const user = useCurrentUser();
   const openTx = useUI((s) => s.openTxEditor);
   const setPalette = useUI((s) => s.setPalette);
+  useSpotlight();
   useHotkey('k', useCallback((e: KeyboardEvent) => { e.preventDefault(); setPalette(true); }, [setPalette]), { meta: true, global: true });
   useHotkey('n', useCallback((e: KeyboardEvent) => { if (user?.role === 'user') { e.preventDefault(); openTx(); } }, [openTx, user?.role]));
   useHotkey('/', useCallback((e: KeyboardEvent) => { e.preventDefault(); setPalette(true); }, [setPalette]));

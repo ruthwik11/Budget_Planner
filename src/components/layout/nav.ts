@@ -1,6 +1,6 @@
 import {
-  ArrowDownLeft, ArrowLeftRight, ArrowUpRight, ChartNoAxesColumn, ChartPie, FileText, Gauge, LayoutDashboard, Repeat,
-  ScrollText, Settings, ShieldCheck, SlidersHorizontal, Target, Users, Wallet, type LucideIcon,
+  ArrowDownLeft, ArrowLeftRight, ArrowUpRight, ChartNoAxesColumn, ChartPie, FileText, FlaskConical, Gauge, Landmark, LayoutDashboard,
+  Percent, Repeat, ScrollText, Settings, ShieldCheck, SlidersHorizontal, Split, Target, Users, Wallet, type LucideIcon,
 } from 'lucide-react';
 
 export interface NavItem {
@@ -21,6 +21,7 @@ export const USER_NAV: NavGroup[] = [
       { to: '/', label: 'Overview', icon: LayoutDashboard },
       { to: '/transactions', label: 'Transactions', icon: ArrowLeftRight, short: 'Activity' },
       { to: '/accounts', label: 'Accounts', icon: Wallet },
+      { to: '/split', label: 'Split', icon: Split },
     ],
   },
   {
@@ -29,6 +30,7 @@ export const USER_NAV: NavGroup[] = [
       { to: '/budgets', label: 'Budgets', icon: Gauge },
       { to: '/goals', label: 'Goals', icon: Target },
       { to: '/recurring', label: 'Recurring', icon: Repeat },
+      { to: '/debts', label: 'Debts & EMIs', icon: Landmark, short: 'Debts' },
     ],
   },
   {
@@ -37,6 +39,8 @@ export const USER_NAV: NavGroup[] = [
       { to: '/income', label: 'Income', icon: ArrowDownLeft },
       { to: '/expenses', label: 'Expenses', icon: ArrowUpRight },
       { to: '/analytics', label: 'Analytics', icon: ChartNoAxesColumn },
+      { to: '/tax', label: 'Tax planner', icon: Percent, short: 'Tax' },
+      { to: '/what-if', label: 'What-if', icon: FlaskConical },
       { to: '/reports', label: 'Reports', icon: FileText },
     ],
   },
@@ -60,3 +64,16 @@ export const SETTINGS_ITEM: NavItem = { to: '/settings', label: 'Settings', icon
 export const PAGE_TITLES: Record<string, string> = Object.fromEntries(
   [...USER_NAV, ...ADMIN_NAV].flatMap((g) => g.items.map((i) => [i.to, i.label])).concat([['/settings', 'Settings'], ['/admin/settings', 'Settings']]),
 );
+
+/** "04 — Plan" style index for editorial page headers. */
+export function navIndex(path: string): { n: string; group: string } | null {
+  for (const groups of [USER_NAV, ADMIN_NAV]) {
+    let i = 0;
+    for (const g of groups)
+      for (const it of g.items) {
+        i++;
+        if (it.to === path) return { n: String(i).padStart(2, '0'), group: g.label };
+      }
+  }
+  return null;
+}

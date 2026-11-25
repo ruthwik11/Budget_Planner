@@ -54,6 +54,14 @@
   --glow: radial-gradient(60% 80% at 15% 0%, rgb(76 157 176 / 0.16), transparent 70%);
   --panel-light: linear-gradient(180deg, rgb(255 255 255 / 0.55), transparent 50%);
   --scrim: rgb(17 52 61 / 0.38);
+  /* band: full-bleed colour block. Light: deep moonstone with vanilla type (4.6:1). */
+  --band: #2c7385;
+  --band-deep: #1f5a69;
+  --band-hi: #3e8ea1;
+  --band-fg: #ffebaf;
+  --band-fg-2: rgb(255 235 175 / 0.78);
+  --band-line: rgb(255 235 175 / 0.22);
+  --band-chip: rgb(255 235 175 / 0.12);
 }
 
 [data-theme='dark'] {
@@ -90,9 +98,22 @@
   --glow: radial-gradient(60% 80% at 15% 0%, rgb(76 157 176 / 0.22), transparent 70%);
   --panel-light: linear-gradient(180deg, rgb(255 235 175 / 0.025), transparent 40%);
   --scrim: rgb(4 14 17 / 0.62);
+  /* dark: the inversion — a vanilla block with moonstone-ink type */
+  --band: #f6dc93;
+  --band-deep: #e9c873;
+  --band-hi: #fff1c6;
+  --band-fg: #0c1e23;
+  --band-fg-2: rgb(12 30 35 / 0.72);
+  --band-line: rgb(12 30 35 / 0.18);
+  --band-chip: rgb(12 30 35 / 0.08);
 }
 
 @theme {
+  --color-band: var(--band);
+  --color-band-fg: var(--band-fg);
+  --color-band-fg-2: var(--band-fg-2);
+  --color-band-line: var(--band-line);
+  --color-band-chip: var(--band-chip);
   --color-bg: var(--bg);
   --color-sunken: var(--bg-sunken);
   --color-surface: var(--surface);
@@ -391,4 +412,187 @@ html[data-reduce-motion='true'] *::after {
 }
 .print-only {
   display: none;
+}
+
+
+/* ═════════════════════ v2: editorial + cinematic layer ═════════════════════ */
+
+/* Display serif: the swatch's tall, high-contrast voice. */
+@utility display-serif {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  letter-spacing: -0.025em;
+  line-height: 0.88;
+  font-feature-settings: 'lnum', 'kern';
+}
+@utility text-outline {
+  color: transparent;
+  -webkit-text-stroke: 1px currentColor;
+}
+
+@layer components {
+/* Pointer spotlight: a soft light follows the cursor across any panel. */
+.panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s var(--ease-out-soft);
+  background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 50%), color-mix(in oklab, var(--accent) 14%, transparent), transparent 60%);
+  z-index: 0;
+}
+.panel:hover::before {
+  opacity: 1;
+}
+.panel > * {
+  position: relative;
+  z-index: 1;
+}
+}
+
+/* Cursor follower (desktop pointers only) */
+.cursor-ring {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 400;
+  pointer-events: none;
+  width: 34px;
+  height: 34px;
+  margin: -17px 0 0 -17px;
+  border-radius: 999px;
+  border: 1.5px solid var(--accent);
+  display: grid;
+  place-items: center;
+  transition: width 0.35s var(--ease-pop), height 0.35s var(--ease-pop), margin 0.35s var(--ease-pop), background 0.3s, border-color 0.3s, opacity 0.3s;
+  mix-blend-mode: normal;
+  opacity: 0;
+}
+.cursor-ring.is-visible {
+  opacity: 1;
+}
+.cursor-ring.is-hover {
+  width: 64px;
+  height: 64px;
+  margin: -32px 0 0 -32px;
+  background: color-mix(in oklab, var(--accent) 18%, transparent);
+  border-color: transparent;
+}
+.cursor-ring.is-down {
+  width: 26px;
+  height: 26px;
+  margin: -13px 0 0 -13px;
+}
+.cursor-ring .cursor-label {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-fg);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.cursor-ring.is-hover .cursor-label {
+  opacity: 1;
+}
+.cursor-dot {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 401;
+  pointer-events: none;
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 -3px;
+  border-radius: 999px;
+  background: var(--accent);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.cursor-dot.is-visible {
+  opacity: 1;
+}
+@media (pointer: coarse) {
+  .cursor-ring,
+  .cursor-dot {
+    display: none;
+  }
+}
+
+/* Route "film" curtain */
+.film {
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+  pointer-events: none;
+  visibility: hidden;
+}
+.film-panel {
+  position: absolute;
+  inset: 0;
+  background: var(--band);
+  color: var(--band-fg);
+  display: flex;
+  align-items: flex-end;
+  padding: 0 6vw 9vh;
+  overflow: hidden;
+}
+.film-hem {
+  position: absolute;
+  inset: 0;
+  background: var(--accent);
+}
+
+/* Content placed on a band: remap tokens so every existing component reads on the colour block. */
+.on-band {
+  --fg: var(--band-fg);
+  --fg-2: var(--band-fg-2);
+  --fg-3: var(--band-fg-2);
+  --fg-4: color-mix(in oklab, var(--band-fg) 55%, transparent);
+  --line: var(--band-line);
+  --line-strong: color-mix(in oklab, var(--band-fg) 32%, transparent);
+  --surface-2: var(--band-chip);
+  --surface-3: color-mix(in oklab, var(--band-fg) 16%, transparent);
+  --grid: var(--band-line);
+  --pos: #c4f2d3;
+  --neg: #ffc4b0;
+  --warn: #ffd98a;
+  --accent: #ffebaf;
+  --accent-fg: #ffebaf;
+  --accent-ink: #1f5a69;
+  --accent-soft: rgb(255 235 175 / 0.14);
+  color: var(--band-fg);
+}
+[data-theme='dark'] .on-band {
+  --pos: #17603f;
+  --neg: #9b3822;
+  --warn: #7d4a00;
+  --accent: #1f5a69;
+  --accent-fg: #1f5a69;
+  --accent-ink: #ffebaf;
+  --accent-soft: rgb(31 90 105 / 0.12);
+}
+
+/* Tailwind's --color-* tokens resolve at :root, so they must be re-pointed inside the band as well. */
+.on-band,
+[data-theme='dark'] .on-band {
+  --color-fg: var(--fg);
+  --color-fg-2: var(--fg-2);
+  --color-fg-3: var(--fg-3);
+  --color-fg-4: var(--fg-4);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-pos: var(--pos);
+  --color-pos-soft: color-mix(in oklab, var(--pos) 18%, transparent);
+  --color-neg: var(--neg);
+  --color-neg-soft: color-mix(in oklab, var(--neg) 18%, transparent);
+  --color-warn: var(--warn);
+  --color-accent: var(--accent);
+  --color-accent-fg: var(--accent-fg);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-soft: var(--accent-soft);
 }

@@ -7,8 +7,10 @@ import {
   AccountsWidget, BudgetsWidget, CashflowWidget, GoalsWidget, InsightsWidget, NarrativeWidget, RecentWidget, SpendingWidget, UpcomingWidget,
 } from './widgets';
 import { gsap } from '@/components/animations/gsap';
-import { AnimatedNumber, Reveal, SplitReveal, Ticker } from '@/components/animations/Motion';
+import { AnimatedNumber, Reveal, Ticker } from '@/components/animations/Motion';
 import { Sparkline } from '@/components/charts/Charts';
+import { LiquidCanvas } from '@/components/fx/LiquidCanvas';
+import { KineticTitle, WordMarquee } from '@/components/fx/Editorial';
 import { Delta, Panel, Segmented } from '@/components/ui/Controls';
 import { Button, IconButton } from '@/components/ui/Button';
 import { Dialog, Drawer } from '@/components/ui/Overlay';
@@ -86,7 +88,7 @@ function Hero({ d }: { d: DashboardData }) {
     const ctx = gsap.context(() => {
       gsap
         .timeline({ defaults: { ease: 'expo.out' } })
-        .from('[data-hero-panel]', { clipPath: 'inset(100% 0% 0% 0% round 18px)', duration: 1.2, ease: 'power4.inOut', clearProps: 'clipPath' })
+        .from('[data-hero-panel]', { clipPath: 'inset(100% 0% 0% 0% round 28px)', duration: 1.2, ease: 'power4.inOut', clearProps: 'clipPath' })
         .from('[data-hero-label]', { opacity: 0, y: 10, duration: 0.6 }, '-=0.55')
         .from('[data-hero-figure]', { yPercent: 60, opacity: 0, duration: 1.1 }, '<0.05')
         .from('[data-stat]', { y: 18, opacity: 0, duration: 0.9, stagger: 0.08, clearProps: 'transform,opacity' }, '-=0.8')
@@ -100,23 +102,19 @@ function Hero({ d }: { d: DashboardData }) {
 
   return (
     <div ref={root} className="mb-4">
-      <section
-        data-hero-panel
-        aria-label="Financial overview"
-        className="panel relative overflow-hidden !rounded-[18px]"
-        style={{ background: 'var(--glow), var(--panel-light), var(--surface)' }}
-      >
-        {/* ledger hairlines — subtle depth behind the figure */}
-        <div className="pointer-events-none absolute inset-0 opacity-60 [background-image:repeating-linear-gradient(180deg,transparent_0_47px,var(--grid)_47px_48px)] [mask-image:linear-gradient(90deg,#000,transparent_65%)]" aria-hidden />
+      <section data-hero-panel aria-label="Financial overview" className="on-band relative isolate overflow-hidden rounded-[28px] bg-band">
+        {/* live liquid surface + ledger hairlines behind the figure */}
+        <LiquidCanvas className="-z-10" />
+        <div className="pointer-events-none absolute inset-0 -z-10 opacity-70 [background-image:repeating-linear-gradient(180deg,transparent_0_47px,var(--band-line)_47px_48px)] [mask-image:linear-gradient(90deg,#000,transparent_70%)]" aria-hidden />
         <div className="relative grid xl:grid-cols-[1.55fr_1fr]">
-          <div className="px-5 pb-2 pt-6 md:px-8 md:pt-8">
+          <div className="px-5 pb-2 pt-7 md:px-10 md:pt-10">
             <div data-hero-label className="flex items-center gap-2">
               <span className="label-mono">Total balance</span>
               <span className="text-2xs text-fg-4">· {d.accts.filter((a) => !a.archived).length} accounts</span>
             </div>
             <div className="mt-3 flex flex-wrap items-end gap-x-6 gap-y-3">
               <div className="overflow-hidden pb-1">
-                <div data-hero-figure className="text-[2.75rem] font-medium leading-[0.95] tracking-[-0.05em] xs:text-[3.4rem] md:text-[4.4rem]">
+                <div data-hero-figure className="display-serif text-[3.6rem] xs:text-[4.4rem] md:text-[6.2rem] xl:text-[7.2rem]">
                   <AnimatedNumber value={d.balance} format={f0} duration={2} delay={0.5} />
                 </div>
               </div>
@@ -146,7 +144,7 @@ function Hero({ d }: { d: DashboardData }) {
             </div>
           </div>
 
-          <aside data-outlook className="grid grid-cols-1 gap-5 border-t border-line bg-sunken/30 px-5 py-6 md:px-8 lg:grid-cols-2 xl:flex xl:flex-col xl:border-l xl:border-t-0 xl:py-8">
+          <aside data-outlook className="grid grid-cols-1 gap-5 border-t border-line bg-[color-mix(in_oklab,var(--band-deep)_45%,transparent)] px-5 py-6 backdrop-blur-[2px] md:px-10 lg:grid-cols-2 xl:flex xl:flex-col xl:border-l xl:border-t-0 xl:py-8">
             <div>
               <div className="label-mono">Projected month end</div>
               <div className="mt-1.5 flex items-baseline gap-2">
@@ -261,17 +259,15 @@ export default function DashboardPage() {
 
   return (
     <>
-      <div className="mb-6 flex flex-col gap-4 md:mb-7 lg:flex-row lg:items-end lg:justify-between">
-        <div>
-          <p className="label-mono mb-2">{new Date().toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
-          <h1 className="text-[1.9rem] font-medium leading-[1.05] tracking-[-0.04em] md:text-[2.5rem]">
-            <SplitReveal>{`${greeting()},`}</SplitReveal>{' '}
-            <SplitReveal delay={0.18} className="serif italic text-fg-2">
-              {first}
-            </SplitReveal>
-          </h1>
-        </div>
-        <div className="flex items-center gap-2">
+      <div className="mb-5 flex items-center gap-4">
+        <motion.span className="label-mono whitespace-nowrap" initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6, delay: 0.1 }}>
+          01 — {new Date().toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long' })}
+        </motion.span>
+        <motion.span aria-hidden className="h-px flex-1 origin-left bg-line-strong" initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ duration: 1.4, delay: 0.15, ease: [0.22, 1, 0.36, 1] }} />
+      </div>
+      <div className="mb-8 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+        <KineticTitle className="text-[clamp(3.2rem,8.5vw,7.25rem)] text-fg">{`${greeting()}, ${first}.`}</KineticTitle>
+        <div className="flex items-center gap-2 lg:mb-3">
           <div className="max-w-full overflow-x-auto scrollbar-none">
             <Segmented<RangePreset>
               label="Date range"
@@ -288,6 +284,7 @@ export default function DashboardPage() {
       </div>
 
       <Hero d={d} />
+      <WordMarquee words={['Earn', 'Spend', 'Save', 'Plan', 'Grow']} className="-mx-4 mb-4 md:-mx-6 lg:-mx-8" />
 
       <Reveal className="grid grid-flow-dense grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-12" stagger={0.08}>
         {visible.map((id) => {
