@@ -4,7 +4,7 @@
 
 ### your money, but make it ✨ *rhythm* ✨
 
-**a budget planner that actually slaps.** no cap, your bank app could never.
+**a budget planner that actually slaps.** your bank app could never.
 
 [![License](https://img.shields.io/badge/License-MIT-007ec6?style=flat)](LICENSE)
 [![Stack](https://img.shields.io/badge/Stack-React%2019%20%7C%20TypeScript%20%7C%20Vite-5b5bd6?style=flat)](#-the-stack-its-giving-modern)
@@ -27,7 +27,7 @@ cadence is a full personal finance app: income, spending, budgets, savings goals
 
 ---
 
-## ✨ the features (it's giving main character)
+## ✨ the features 
 
 | | vibe check |
 |---|---|
@@ -46,7 +46,7 @@ cadence is a full personal finance app: income, spending, budgets, savings goals
 
 ---
 
-## 🎨 the aesthetic (we ate)
+## 🎨 the aesthetic 
 
 - **palette:** Vanilla `#FFEBAF` × Moonstone `#4C9DB0`. that's it. that's the brand 🍦🌊
 - **light mode** = vanilla paper. **dark mode** = moonstone night where the vanilla flips into the highlighter. both are first-class, not an afterthought
@@ -69,7 +69,7 @@ this is the part where we're serious for 5 seconds:
 
 ---
 
-## 🛠️ the stack (it's giving modern)
+## 🛠️ the stack 
 
 `React 19` · `TypeScript` · `Vite` · `Tailwind CSS 4` · `Framer Motion` · `GSAP` (+ ScrollTrigger, SplitText) · `Lenis` · `Zustand` · `Recharts` · `React Hook Form` · `Zod` · `Lucide`
 
