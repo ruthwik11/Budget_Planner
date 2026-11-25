@@ -151,6 +151,27 @@ export default function LoginPage() {
           transition={{ duration: 0.9, delay: 0.2, ease: EASE.outQuint }}
           className="w-full max-w-[400px]"
         >
+          {/* compact brand band for tablets/phones, where the orbit panel is hidden */}
+          <div className="relative mb-8 overflow-hidden rounded-[18px] bg-accent p-5 text-accent-ink lg:hidden">
+            <div className="flex items-center gap-3">
+              <motion.div initial={{ rotate: -20, scale: 0.7, opacity: 0 }} animate={{ rotate: 0, scale: 1, opacity: 1 }} transition={{ duration: 1, delay: 0.3, ease: EASE.outQuint }}>
+                <svg width="40" height="40" viewBox="0 0 32 32" aria-hidden>
+                  <rect width="32" height="32" rx="8.5" fill="var(--accent-ink)" />
+                  <path d="M7.5 20.5c2.6 0 3.4-9 6-9s3.4 9 6 9 2.6-5 5-5" fill="none" stroke="var(--accent)" strokeWidth="2.6" strokeLinecap="round" />
+                </svg>
+              </motion.div>
+              <SplitReveal as="p" delay={0.4} className="text-[1.6rem] font-medium leading-none tracking-[-0.04em]">
+                Money, in rhythm.
+              </SplitReveal>
+            </div>
+            <div className="mt-5 flex gap-2" aria-hidden>
+              {ORBIT.slice(0, 7).map((ic, i) => (
+                <motion.span key={ic} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 + i * 0.06, duration: 0.6, ease: EASE.outQuint }} className="grid size-9 place-items-center rounded-[10px] bg-[color-mix(in_oklab,var(--accent-ink)_12%,transparent)]">
+                  <CategoryGlyph icon={ic} color="var(--accent-ink)" size={26} className="!bg-transparent !shadow-none" />
+                </motion.span>
+              ))}
+            </div>
+          </div>
           <p className="label-mono">Choose a profile</p>
           <h2 className="mt-2 text-[1.9rem] font-medium leading-tight tracking-[-0.035em]">
             Open your <span className="serif italic text-accent-fg">workspace</span>

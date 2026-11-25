@@ -115,7 +115,7 @@ export default function AnalyticsPage() {
       wd[i].amount += t.amount;
       wd[i].count++;
     });
-    const largest = txs.filter((t) => t.type === 'expense' && t.date >= range.from && t.date <= range.to).sort((x, z) => z.amount - x.amount).slice(0, 8);
+    const largest = txs.filter((t) => t.type === 'expense' && !t.recurringId && t.date >= range.from && t.date <= range.to).sort((x, z) => z.amount - x.amount).slice(0, 8);
     const best = [...series].filter((p) => p.income).sort((x, z) => z.savingsRate - x.savingsRate)[0];
     return { range, cur, before, months, cashflow, rate, pace, annual, expSlices, incSlices, heat, hmMonths, wd, largest, best, fc, y };
   }, [txs, cats, preset, today]);

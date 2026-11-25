@@ -177,7 +177,7 @@ function Hero({ d }: { d: DashboardData }) {
               </div>
               <div>
                 <dt className="label-mono">Budgets used</dt>
-                <dd className={cn('mt-1 text-base font-medium num', d.budgetPct > 100 ? 'text-neg' : d.budgetPct > 80 ? 'text-warn' : '')}>{d.budgetPct.toFixed(0)}%</dd>
+                <dd className={cn('mt-1 text-base font-medium num', d.budgetPct > 100 ? 'text-neg' : d.budgetPct > 80 ? 'text-warn' : '')}>{d.budgetPct.toFixed(1)}%</dd>
                 <dd className="text-2xs text-fg-4 num">{f0(monthBudgetSpent)} of {f0(d.budgetTotal)}</dd>
               </div>
               <div>

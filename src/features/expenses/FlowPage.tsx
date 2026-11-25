@@ -59,7 +59,8 @@ export function FlowPage({ kind }: { kind: CategoryKind }) {
     }
     const series = monthlySeries(txs, chartRange);
     const methods = PAYMENT_METHODS.map((m) => ({ ...m, amount: sumMinor(inRangeTx.filter((t) => t.paymentMethod === m.id).map((t) => t.amount)) })).filter((m) => m.amount > 0).sort((a, b) => b.amount - a.amount);
-    const largest = [...inRangeTx].sort((a, b) => b.amount - a.amount).slice(0, 5);
+    // one-off purchases only: repeating bills (rent, subscriptions) would otherwise fill every slot
+    const largest = inRangeTx.filter((t) => !t.recurringId).sort((a, b) => b.amount - a.amount).slice(0, 5);
     const usage = new Map<string, number>();
     scoped.forEach((t) => t.categoryId && usage.set(t.categoryId, (usage.get(t.categoryId) ?? 0) + 1));
     return {

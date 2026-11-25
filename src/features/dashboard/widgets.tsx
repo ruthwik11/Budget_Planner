@@ -335,8 +335,8 @@ export function NarrativeWidget({ d }: { d: DashboardData }) {
   if (d.goals.length) parts.push(`Your goals are ${d.goalPct.toFixed(0)}% funded.`);
   const today = todayISO();
   return (
-    <div className="grid gap-6 md:grid-cols-[180px_1fr] md:gap-10">
-      <div className="flex flex-col gap-1">
+    <div className="grid gap-6 xl:grid-cols-[180px_1fr] xl:gap-10">
+      <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 xl:flex-col xl:flex-nowrap xl:items-start">
         <span className="label-mono">Month in review</span>
         <span className="serif text-[2rem] italic leading-none text-fg-2">{monthLabel(today.slice(0, 7), 'long')}</span>
         <span className="mt-1 text-xs text-fg-4">Written from your data</span>

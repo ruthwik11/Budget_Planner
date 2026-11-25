@@ -98,7 +98,7 @@ export default function SettingsPage() {
             </div>
             {nameErr && <p role="alert" className="mt-1 text-xs text-neg">{nameErr}</p>}
           </Row>
-          <Row label="Theme" hint="Dark is designed first; light is a bone-paper variant.">
+          <Row label="Theme" hint="Vanilla is the default; Moonstone night is the dark variant.">
             <Segmented<ThemePref>
               label="Theme"
               value={prefs.theme}
