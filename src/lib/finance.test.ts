@@ -142,3 +142,13 @@ describe('csv', () => {
     expect(parseCSV(csv)).toEqual([['a', 'b'], ['x, y', 'he said "hi"']]);
   });
 });
+
+describe('schemas', () => {
+  it('rejects impossible calendar dates', async () => {
+    const { csvRowSchema } = await import('@/schemas');
+    const row = { type: 'expense', title: 'x', category: 'Food', amount: '10' };
+    expect(csvRowSchema.safeParse({ ...row, date: '2026-13-01' }).success).toBe(false);
+    expect(csvRowSchema.safeParse({ ...row, date: '2026-02-30' }).success).toBe(false);
+    expect(csvRowSchema.safeParse({ ...row, date: '2028-02-29' }).success).toBe(true);
+  });
+});

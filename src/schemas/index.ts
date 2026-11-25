@@ -8,7 +8,15 @@ const cleanText = (max: number) =>
     .transform((s) => s.replace(/[\u0000-\u001F\u007F]/g, ' ').trim())
     .pipe(z.string().max(max));
 
-const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Use YYYY-MM-DD');
+/** A real calendar date in YYYY-MM-DD (rejects 2026-13-01, 2026-02-30…). */
+const isoDate = z
+  .string()
+  .regex(/^\d{4}-\d{2}-\d{2}$/, 'Use YYYY-MM-DD')
+  .refine((s) => {
+    const [y, m, d] = s.split('-').map(Number);
+    const dt = new Date(Date.UTC(y, m - 1, d));
+    return y >= 1900 && y <= 2200 && dt.getUTCFullYear() === y && dt.getUTCMonth() === m - 1 && dt.getUTCDate() === d;
+  }, 'Not a real date');
 
 /** Form amount field: a string the user typed → positive minor units. */
 export const moneyInput = z

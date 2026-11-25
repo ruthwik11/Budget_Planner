@@ -246,16 +246,16 @@ export function Panel({
   return (
     <As className={cn('panel flex flex-col', className)} aria-labelledby={title ? hid : undefined} id={id}>
       {(title || actions) && (
-        <header className="flex min-h-[52px] items-center justify-between gap-3 px-5 pt-4">
-          <div className="min-w-0">
+        <header className="flex min-h-[52px] flex-wrap items-center justify-between gap-x-3 gap-y-2 px-5 pt-4">
+          <div className="min-w-0 flex-1 basis-[12rem]">
             {eyebrow && <div className="label-mono mb-0.5">{eyebrow}</div>}
             {title && (
-              <h2 id={hid} className="truncate text-[0.9375rem] font-medium tracking-tight">
+              <h2 id={hid} className="text-balance text-[0.9375rem] font-medium leading-snug tracking-tight">
                 {title}
               </h2>
             )}
           </div>
-          {actions && <div className="flex shrink-0 items-center gap-1">{actions}</div>}
+          {actions && <div className="flex shrink-0 flex-wrap items-center gap-1">{actions}</div>}
         </header>
       )}
       <div className={cn('flex-1 px-5 pb-5 pt-3', bodyClassName)}>{children}</div>

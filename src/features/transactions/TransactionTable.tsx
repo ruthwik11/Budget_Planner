@@ -123,7 +123,7 @@ export function TransactionTable({
                     <button onClick={() => openDetail(t.id)} className="flex min-w-0 flex-1 items-center gap-3 text-left">
                       <CategoryGlyph icon={c?.icon ?? 'wallet'} color={c?.color ?? 'var(--info)'} size={36} />
                       <span className="min-w-0 flex-1">
-                        <span className="block truncate text-sm">{t.title}</span>
+                        <span className="line-clamp-2 block text-sm leading-snug">{t.title}</span>
                         <span className="block truncate text-xs text-fg-3">{t.type === 'transfer' ? 'Transfer' : c?.name} · {acctMap.get(t.accountId)?.name}</span>
                       </span>
                       <span className="text-sm">{amountCell(t)}</span>

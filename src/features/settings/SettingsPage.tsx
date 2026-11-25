@@ -17,6 +17,7 @@ import { backupSchema, profileForm } from '@/schemas';
 import { DATASETS, type DatasetId } from '@/mock-data/seed';
 import { downloadFile, readFileText } from '@/utils/download';
 import { cn } from '@/utils/cn';
+import { scrollToElement } from '@/components/animations/Cinematic';
 
 function Row({ label, hint, children, htmlFor }: { label: string; hint?: ReactNode; children: ReactNode; htmlFor?: string }) {
   return (
@@ -48,7 +49,10 @@ export default function SettingsPage() {
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (location.hash === '#notifications') document.getElementById('notifications')?.scrollIntoView({ behavior: 'smooth' });
+    // wait for the route transition to finish before scrolling to the section
+    if (location.hash !== '#notifications') return;
+    const t = setTimeout(() => scrollToElement(document.getElementById('notifications')), 950);
+    return () => clearTimeout(t);
   }, []);
 
   const saveName = () => {

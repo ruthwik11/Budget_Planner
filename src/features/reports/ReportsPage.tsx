@@ -93,8 +93,8 @@ export default function ReportsPage() {
 
   const Row = ({ label, value, sub, strong, tone }: { label: React.ReactNode; value: string; sub?: React.ReactNode; strong?: boolean; tone?: string }) => (
     <div className="flex items-baseline justify-between gap-4 border-b border-dashed border-line py-1.5 text-sm last:border-0">
-      <span className={cn('min-w-0 truncate', strong ? 'font-medium' : 'text-fg-2')}>{label}</span>
-      <span className="flex shrink-0 items-baseline gap-3">
+      <span className={cn('min-w-0 break-words', strong ? 'font-medium' : 'text-fg-2')}>{label}</span>
+      <span className="flex shrink-0 flex-wrap items-baseline justify-end gap-x-3">
         {sub && <span className="text-xs text-fg-4 num">{sub}</span>}
         <span className={cn('num', strong && 'font-medium', tone)}>{value}</span>
       </span>

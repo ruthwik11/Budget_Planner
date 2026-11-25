@@ -203,7 +203,7 @@ export default function WhatIfPage() {
                     <li key={x.g.id} className="flex items-center gap-4 py-3">
                       <CategoryGlyph icon={x.g.icon} color={x.g.color} size={32} />
                       <div className="min-w-0 flex-1">
-                        <div className="truncate text-sm font-medium">{x.g.title}</div>
+                        <div className="line-clamp-2 text-sm font-medium leading-snug">{x.g.title}</div>
                         <div className="text-xs text-fg-3 num">{f0(x.rem)} to go</div>
                       </div>
                       <div className="text-right text-sm">

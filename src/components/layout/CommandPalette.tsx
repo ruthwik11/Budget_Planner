@@ -12,6 +12,7 @@ import { useThemeToggle } from './AppShell';
 import { CategoryGlyph } from '@/components/ui/Icon';
 import { Kbd } from '@/components/ui/Controls';
 import { cn } from '@/utils/cn';
+import { formatDate } from '@/utils/dates';
 import { EASE } from '@/constants/motion';
 
 interface Cmd {
@@ -73,7 +74,8 @@ export function CommandPalette() {
             .map<Cmd>((t) => {
               const c = t.categoryId ? catMap.get(t.categoryId) : undefined;
               return {
-                id: t.id, group: 'Transactions', label: t.title, hint: `${t.type === 'income' ? '+' : t.type === 'expense' ? '−' : ''}${fmt(t.amount)}`,
+                id: t.id, group: 'Transactions', label: t.title,
+                hint: `${formatDate(t.date, 'DD MMM YYYY')} · ${t.type === 'income' ? '+' : t.type === 'expense' ? '−' : ''}${fmt(t.amount)}`,
                 icon: <CategoryGlyph icon={c?.icon ?? 'wallet'} color={c?.color ?? 'var(--info)'} size={22} />,
                 run: () => { close(); openDetail(t.id); },
               };

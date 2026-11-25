@@ -43,7 +43,7 @@ function GoalCard({ goal, onContribute, onEdit, onDelete, onHistory }: { goal: G
         <div className="flex min-w-0 items-center gap-3">
           <CategoryGlyph icon={goal.icon} color={goal.color} size={34} />
           <div className="min-w-0">
-            <h3 className="truncate font-medium">{goal.title}</h3>
+            <h3 className="line-clamp-2 font-medium leading-snug">{goal.title}</h3>
             <p className="flex items-center gap-1 text-xs text-fg-3">
               <CalendarDays size={11} />
               {goal.deadline ? `by ${formatDate(goal.deadline, dateFmt)}` : 'No deadline'}

@@ -62,7 +62,7 @@ export function ImportDialog({ open, onClose }: { open: boolean; onClose: () => 
         paymentMethod: 'other' as const, tags: ['imported'],
       })),
     );
-    toast({ tone: 'success', title: `Imported ${n} transactions`, body: preview.newCategories.length ? `${preview.newCategories.length} new categories created.` : undefined });
+    toast({ tone: 'success', title: `Imported ${n} transaction${n === 1 ? '' : 's'}`, body: preview.newCategories.length ? `${preview.newCategories.length} new ${preview.newCategories.length === 1 ? 'category' : 'categories'} created.` : undefined });
     reset();
     onClose();
   };
@@ -105,7 +105,7 @@ export function ImportDialog({ open, onClose }: { open: boolean; onClose: () => 
           <div className="flex flex-wrap gap-2">
             <Badge tone="pos">{preview.valid.length} valid</Badge>
             {preview.errors.length > 0 && <Badge tone="neg">{preview.errors.length} skipped</Badge>}
-            {preview.newCategories.length > 0 && <Badge tone="info">{preview.newCategories.length} new categories</Badge>}
+            {preview.newCategories.length > 0 && <Badge tone="info">{preview.newCategories.length} new {preview.newCategories.length === 1 ? 'category' : 'categories'}</Badge>}
           </div>
           {preview.errors.length > 0 && (
             <ul className="max-h-40 overflow-y-auto rounded-[10px] border border-line bg-surface-2 p-3 text-xs text-fg-3">

@@ -114,8 +114,11 @@ export function SplitReveal({
 // ───────────────────────── Reveal (scroll / mount stagger) ─────────────────────────
 
 /**
- * Staggers direct children marked [data-reveal] into view as their container scrolls in.
- * Uses ScrollTrigger.batch so many cards entering together share one staggered timeline.
+ * Staggers children marked [data-reveal] into view as they enter the viewport.
+ * Uses IntersectionObserver (not ScrollTrigger positions) so reveals can never
+ * go stale when charts resize the page, a route transition is still running, or
+ * smooth scrolling owns the scroll position. Items entering together share one
+ * staggered tween.
  */
 export function Reveal({
   children, className, as: Tag = 'div', y = 24, stagger = 0.07, delay = 0, id,
@@ -123,22 +126,30 @@ export function Reveal({
   const ref = useRef<HTMLElement>(null);
   useLayoutEffect(() => {
     const el = ref.current;
-    if (!el || reducedMotionNow()) return;
-    const ctx = gsap.context(() => {
-      const items = gsap.utils.toArray<HTMLElement>('[data-reveal]', el);
-      if (!items.length) return;
-      gsap.set(items, { y, opacity: 0 });
-      ScrollTrigger.batch(items, {
-        start: 'top 94%',
-        once: true,
-        onEnter: (batch) =>
-          gsap.to(batch, {
-            y: 0, opacity: 1, duration: 0.85, ease: 'expo.out', stagger, delay,
-            clearProps: 'transform,opacity',
-          }),
-      });
-    }, el);
-    return () => ctx.revert();
+    if (!el || reducedMotionNow() || typeof IntersectionObserver === 'undefined') return;
+    const items = gsap.utils.toArray<HTMLElement>('[data-reveal]', el);
+    if (!items.length) return;
+    const ctx = gsap.context(() => gsap.set(items, { y, opacity: 0 }), el);
+    const pending = new Set(items);
+    const io = new IntersectionObserver(
+      (entries) => {
+        const batch = entries.filter((e) => e.isIntersecting && pending.has(e.target as HTMLElement)).map((e) => e.target as HTMLElement);
+        if (!batch.length) return;
+        batch.sort((a, b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top || a.getBoundingClientRect().left - b.getBoundingClientRect().left);
+        batch.forEach((t) => {
+          pending.delete(t);
+          io.unobserve(t);
+        });
+        gsap.to(batch, { y: 0, opacity: 1, duration: 0.85, ease: 'expo.out', stagger, delay, overwrite: true, clearProps: 'transform,opacity' });
+      },
+      { rootMargin: '0px 0px -6% 0px', threshold: 0 },
+    );
+    items.forEach((t) => io.observe(t));
+    return () => {
+      io.disconnect();
+      gsap.killTweensOf(items);
+      ctx.revert();
+    };
   }, [y, stagger, delay]);
   return (
     <Tag ref={ref} className={className} id={id}>

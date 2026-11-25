@@ -90,7 +90,8 @@ export function formatMoney(minor: Minor, o: FormatOptions): string {
   });
   const value = decimals ? minorToDecimalString(minor) : String(Math.round(minor / 100));
   // Intl accepts exact decimal strings (NumberFormat v3); avoids float rounding.
-  return f.format(value as unknown as number);
+  // Use a true minus sign (U+2212) so negatives match the rest of the typography.
+  return f.format(value as unknown as number).replace(/^-/, '\u2212');
 }
 
 /** Compact form for axes and dense UI: ₹12.4L, $1.2M, €840. */

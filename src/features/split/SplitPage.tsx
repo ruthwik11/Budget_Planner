@@ -270,7 +270,7 @@ export default function SplitPage() {
                           <motion.li key={row.e.id} layout initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(i, 10) * 0.03 }} className="group flex items-center gap-3 rounded-[10px] px-2 py-2.5 hover:bg-surface-2">
                             <span className="display-serif w-12 text-center text-lg leading-none text-fg-3">{formatDate(row.e.date, dateFmt).slice(0, 6)}</span>
                             <span className="min-w-0 flex-1">
-                              <span className="block truncate text-sm">{row.e.title}</span>
+                              <span className="line-clamp-2 block text-sm leading-snug">{row.e.title}</span>
                               <span className="block text-xs text-fg-3">{name(row.e.paidBy)} paid · {row.e.mode === 'equal' ? `split ${Object.keys(row.e.shares).length || g.members.length} ways` : row.e.mode === 'exact' ? 'exact split' : 'by percentage'}</span>
                             </span>
                             <span className="text-right">

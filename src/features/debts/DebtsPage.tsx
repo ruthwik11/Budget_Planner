@@ -240,8 +240,8 @@ function DebtCard({ d, onPay, onEdit, onDelete, onSchedule, clearedIn }: { d: De
         <header className="flex items-start gap-3">
           <span className="mt-1 size-2.5 shrink-0 rounded-full" style={{ background: d.color }} />
           <div className="min-w-0 flex-1">
-            <h3 className="truncate font-medium">{d.name}</h3>
-            <p className="truncate text-xs text-fg-3">{d.lender || KINDS.find((k) => k.id === d.kind)?.label} · {pctStr(d.aprBps)} APR</p>
+            <h3 className="font-medium leading-snug">{d.name}</h3>
+            <p className="text-xs text-fg-3">{d.lender || KINDS.find((k) => k.id === d.kind)?.label} · {pctStr(d.aprBps)} APR</p>
           </div>
           {bal === 0 ? <Badge tone="pos">Cleared</Badge> : d.kind === 'credit-card' && d.aprBps >= 2400 ? <Badge tone="neg">High interest</Badge> : null}
           <Menu trigger={(p) => <IconButton label={`Actions for ${d.name}`} size="sm" {...p}><MoreHorizontal size={16} /></IconButton>} items={[
@@ -325,7 +325,7 @@ export default function DebtsPage() {
             eyebrow={owed === 0 ? 'All clear' : 'Debt-free by'}
             figure={owed === 0 ? 'Debt-free.' : plan.debtFreeDate ? monthLabel(monthKey(plan.debtFreeDate), 'long', true) : 'Not yet'}
             caption={owed === 0 ? 'Every balance is paid off.' : plan.months !== null
-              ? <>That’s {plan.months} months with {f0(extra)} extra each month on the {strategy} plan, saving {f0(interestSaved)} in interest{monthsSaved ? ` and ${monthsSaved} months` : ''} versus paying minimums.</>
+              ? <>That’s {plan.months} months on the {strategy} plan{extra > 0 ? <> with {f0(extra)} extra each month</> : <>, rolling each cleared EMI into the next debt</>}, saving {f0(Math.max(0, interestSaved))} in interest{monthsSaved ? ` and ${monthsSaved} months` : ''} versus paying minimums only.</>
               : 'At current payments some balances never shrink. Raise an EMI or add extra.'}
             stats={[
               { label: 'Total owed', value: <AnimatedNumber value={owed} format={f0} /> },
@@ -396,7 +396,7 @@ export default function DebtsPage() {
             </Panel>
           </div>
 
-          <Reveal className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <Reveal className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
             {debts.map((d) => (
               <DebtCard key={d.id} d={d} clearedIn={plan.clearedAt[d.id]} onPay={() => setPaying(d)} onEdit={() => { setEditing(d); setFormOpen(true); }} onDelete={() => setDeleting(d)} onSchedule={() => setSchedule(d)} />
             ))}

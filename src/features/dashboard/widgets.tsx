@@ -125,7 +125,7 @@ export function GoalsWidget({ d }: { d: DashboardData }) {
               <span className="text-[10px] font-medium num">{Math.round(p.pct)}</span>
             </Ring>
             <span className="min-w-0 flex-1">
-              <span className="block truncate text-sm">{goal.title}</span>
+              <span className="line-clamp-2 block text-sm leading-snug">{goal.title}</span>
               <span className="block text-xs text-fg-3 num">
                 {fmt(p.saved, { decimals: false })} of {fmt(goal.target, { decimals: false })}
               </span>

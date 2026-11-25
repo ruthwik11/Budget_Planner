@@ -245,7 +245,7 @@ export default function RecurringPage() {
                 const c = catMap.get(r.categoryId);
                 const next = r.active ? nextOccurrence(r, r.lastPosted ?? addDays(r.startDate, -1)) : null;
                 return (
-                  <motion.li key={r.id} layout data-reveal exit={{ opacity: 0, height: 0 }} className={cn('grid grid-cols-[auto_1fr_auto] items-center gap-3 rounded-[12px] px-2 py-3 md:grid-cols-[auto_1.4fr_1fr_1fr_auto_auto]', !r.active && 'opacity-50')}>
+                  <motion.li key={r.id} layout data-reveal exit={{ opacity: 0, height: 0 }} className={cn('grid grid-cols-[auto_1fr_auto_auto] items-center gap-3 rounded-[12px] px-2 py-3 xl:grid-cols-[auto_1.4fr_1fr_1fr_auto_auto]', !r.active && 'opacity-50')}>
                     <CategoryGlyph icon={c?.icon} color={c?.color} size={36} />
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
@@ -255,11 +255,11 @@ export default function RecurringPage() {
                       </div>
                       <div className="truncate text-xs text-fg-3">{c?.name} · {acctMap.get(r.accountId)?.name}</div>
                     </div>
-                    <div className="hidden text-sm text-fg-2 md:block">
+                    <div className="hidden text-sm text-fg-2 xl:block">
                       {freqLabel(r)}
                       <div className="text-xs text-fg-4">since {formatDate(r.startDate, dateFmt)}</div>
                     </div>
-                    <div className="hidden text-sm md:block">
+                    <div className="hidden text-sm xl:block">
                       {next ? <>Next <span className="text-fg-2">{relativeDay(next)}</span></> : <span className="text-fg-4">—</span>}
                       <div className="text-xs text-fg-4 num">≈ {f0(monthlyEquivalent(r))}/mo</div>
                     </div>

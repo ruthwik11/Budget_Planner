@@ -4,8 +4,9 @@ import { useMoney } from './useMoney';
 import { usePrefs } from '@/store/prefs';
 import { useFinance } from '@/store/finance';
 import { budgetUsage, goalProgress, totals, upcoming } from '@/lib/finance';
-import { addMonths, endOfMonth, monthLabel, relativeDay, startOfMonth, todayISO } from '@/utils/dates';
+import { addDays, addMonths, endOfMonth, fromISO, monthLabel, relativeDay, startOfMonth, todayISO } from '@/utils/dates';
 import { BUDGET_WARN_AT } from '@/constants/options';
+import { debtBalance } from '@/lib/debts';
 import type { AppNotification } from '@/types';
 
 /**
@@ -20,6 +21,8 @@ export function useNotifications() {
   const read = usePrefs((s) => s.readNotifications);
   const dismissed = usePrefs((s) => s.dismissedNotifications);
   const events = useFinance((s) => s.events);
+  const allDebts = useFinance((s) => s.debts);
+  const userId = useFinance((s) => s.sessionUserId);
 
   return useMemo(() => {
     const today = todayISO();
@@ -62,6 +65,19 @@ export function useNotifications() {
           title: `${u.recurring.title} due ${relativeDay(u.date, today).toLowerCase()}`,
           body: `${fmt(u.recurring.amount)} scheduled.`,
         });
+    if (prefs.upcoming)
+      for (const d of allDebts) {
+        if (d.userId !== userId || debtBalance(d) <= 0) continue;
+        const thisMonth = addDays(startOfMonth(today), d.dueDay - 1);
+        const due = fromISO(today).getDate() <= d.dueDay ? thisMonth : addMonths(thisMonth, 1, d.dueDay);
+        const days = Math.round((fromISO(due).getTime() - fromISO(today).getTime()) / 86_400_000);
+        const paid = d.payments.some((p) => p.date.slice(0, 7) === due.slice(0, 7));
+        if (days <= 3 && !paid)
+          list.push({
+            id: `emi:${d.id}:${due}`, kind: 'upcoming', severity: 'warning', at, href: '/debts',
+            title: `${d.name} EMI due ${relativeDay(due, today).toLowerCase()}`, body: `${fmt(d.payment)} to ${d.lender || 'your lender'}.`,
+          });
+      }
     if (prefs.summary) {
       const last = addMonths(startOfMonth(today), -1, 1);
       const t = totals(txs, { from: last, to: endOfMonth(last) });
@@ -77,5 +93,5 @@ export function useNotifications() {
     const visible = list.filter((n) => !dismissed.includes(n.id));
     const unread = visible.filter((n) => !read.includes(n.id)).length;
     return { list: visible, unread, isRead: (id: string) => read.includes(id) };
-  }, [txs, buds, gls, recs, catMap, fmt, prefs, read, dismissed, events]);
+  }, [txs, buds, gls, recs, catMap, fmt, prefs, read, dismissed, events, allDebts, userId]);
 }

@@ -72,6 +72,15 @@ export function CurtainIntro({ onDone }: { onDone: () => void }) {
 
 // ───────────────────────── Smooth scroll ─────────────────────────
 
+let activeLenis: Lenis | null = null;
+
+/** Scroll to an element through Lenis when it's running (native smooth scroll is overridden by it). */
+export function scrollToElement(el: HTMLElement | null, offset = -96) {
+  if (!el) return;
+  if (activeLenis) activeLenis.scrollTo(el, { offset, duration: 1.2 });
+  else window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY + offset, behavior: reducedMotionNow() ? 'auto' : 'smooth' });
+}
+
 /** Lenis with TTM's tuning (1.2s, expo-out), driven by GSAP's ticker so ScrollTrigger stays in sync. */
 export function SmoothScroll() {
   const enabled = usePrefs((s) => s.smoothScroll);
@@ -88,6 +97,7 @@ export function SmoothScroll() {
       syncTouch: false,
     });
     lenisRef.current = lenis;
+    activeLenis = lenis;
     lenis.on('scroll', ScrollTrigger.update);
     const tick = (time: number) => lenis.raf(time * 1000);
     gsap.ticker.add(tick);
@@ -96,6 +106,7 @@ export function SmoothScroll() {
       gsap.ticker.remove(tick);
       lenis.destroy();
       lenisRef.current = null;
+      if (activeLenis === lenis) activeLenis = null;
     };
   }, [enabled, reduced]);
 
