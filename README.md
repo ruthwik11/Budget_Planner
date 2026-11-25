@@ -1,91 +1,140 @@
-# Cadence: Budget Planner
+<div align="center">
 
-A frontend-only personal finance app: income and expenses, budgets, savings goals, recurring transactions, multiple accounts, analytics, forecasts and reports. Data lives in your browser. There is no backend.
+# 💸 cadence
+
+### your money, but make it ✨ *rhythm* ✨
+
+**a budget planner that actually slaps.** no cap, your bank app could never.
+
+[![License](https://img.shields.io/badge/License-MIT-007ec6?style=flat)](LICENSE)
+[![Stack](https://img.shields.io/badge/Stack-React%2019%20%7C%20TypeScript%20%7C%20Vite-5b5bd6?style=flat)](#-the-stack-its-giving-modern)
+[![Financial Guardrails](https://img.shields.io/badge/Financial%20Guardrails-Deterministic%20Plain%20Code-44cc11?style=flat)](#-the-math-is-mathing)
+[![Wrong-Approval Rate](https://img.shields.io/badge/Wrong--Approval%20Rate-0.0%25%20%28Safety%20Target%29-10b981?style=flat)](#-the-math-is-mathing)
+
+### 🔗 [**try it live → cadence-budget-planner.vercel.app**](https://cadence-budget-planner.vercel.app)
+
+</div>
+
+---
+
+## 👀 ok but what is it
+
+you know how every budget app looks like a spreadsheet had a midlife crisis? yeah. **not this one.**
+
+cadence is a full personal finance app: income, spending, budgets, savings goals, loans, splitting bills with the group chat, tax, and a little crystal ball that tells you what happens if you buy that car. it runs **entirely in your browser**. no backend, no sign-up, no one selling your data. your money tea stays *your* money tea ☕
+
+> pick a demo profile (**Alex**, **Sarah**, or **Admin**), hit the button, and you're in. zero passwords. it's a demo, bestie, not a bank vault.
+
+---
+
+## ✨ the features (it's giving main character)
+
+| | vibe check |
+|---|---|
+| 🏠 **overview** | your whole financial era on one screen. giant balance, cash-flow chart, where your money went, month-end forecast, plus a "month in review" written from *your* data |
+| 💳 **transactions** | search, filter, sort, bulk delete (with undo bc we all panic-click), CSV import/export |
+| 🏦 **accounts** | checking, savings, cards, cash. move money between them without it counting as spending |
+| 🎯 **budgets** | weekly/monthly/yearly limits, rollover, and a little tick showing where you'll land at your current pace. lowkey judgmental, highkey helpful |
+| 🐷 **goals** | save for the trip, the camera, the down payment. shows when you'll get there and throws confetti at 25/50/75/100% 🎉 |
+| 🔁 **recurring** | rent, salary, netflix. posts itself when due. pause, skip, or post early |
+| 🏛️ **debts & EMIs** | car loan, edu loan, that credit card you don't talk about. avalanche vs snowball plans + a slider for extra payments → your exact **debt-free date** |
+| 🍕 **split** | goa trip with the gang? split equally, by exact amounts, or by % and settle up in the fewest transfers. no more "bro you owe me" texts |
+| 🧾 **tax planner** | new vs old regime on your real income (FY 2025-26 slabs). tells you which one saves more. *estimates, not tax advice fr* |
+| 🔮 **what-if** | "what if i get a raise / cut dining by 40% / take a 3-month break?" see the next 24 months redraw live |
+| 📊 **analytics + reports** | heatmaps, trends, forecasts, and monthly/annual statements you can save as PDF |
+| 🛡️ **admin** | manage demo profiles, audit trail, budget policy. (front-end demo only, not real security, we're being honest here) |
+
+---
+
+## 🎨 the aesthetic (we ate)
+
+- **palette:** Vanilla `#FFEBAF` × Moonstone `#4C9DB0`. that's it. that's the brand 🍦🌊
+- **light mode** = vanilla paper. **dark mode** = moonstone night where the vanilla flips into the highlighter. both are first-class, not an afterthought
+- **giant serif headlines** whose letters rise into place like a movie title card 🎬
+- **liquid hero blocks**: a live WebGL shader that flows and reacts to your mouse (no 3D library, just one tiny shader)
+- **film-cut page transitions**, a cursor that vibes with buttons, cards that tilt in 3D, a light that follows your mouse
+- **every text passes WCAG AA contrast.** pretty AND accessible, imagine
+- motion too much? **reduce motion** in settings and it all chills out ✌️
+
+---
+
+## 🧮 the math is mathing
+
+this is the part where we're serious for 5 seconds:
+
+- **no floating-point money.** every amount is stored in whole paise/cents, so `0.1 + 0.2` is exactly `0.3` here. your bank balance won't randomly end in .0000001
+- **deterministic plain code.** budgets, loans, tax, splits and forecasts are all regular, testable TypeScript. no AI guessing your money, no vibes-based arithmetic
+- **37 unit tests** on the money logic (`npm test`): EMIs, payoff plans, tax slabs (₹12.75L → ₹0 under the new regime ✅), split shares that always add up to the paisa
+- **validated everything:** forms, imports and backups go through Zod. fake dates like `2026-13-01` get rejected, no cap
+
+---
+
+## 🛠️ the stack (it's giving modern)
+
+`React 19` · `TypeScript` · `Vite` · `Tailwind CSS 4` · `Framer Motion` · `GSAP` (+ ScrollTrigger, SplitText) · `Lenis` · `Zustand` · `Recharts` · `React Hook Form` · `Zod` · `Lucide`
+
+deployed on **Vercel**. data lives in your browser's localStorage.
+
+---
+
+## 🚀 run it locally (speedrun)
 
 ```bash
+git clone https://github.com/ruthwik11/Budget_Planner.git
+cd Budget_Planner
 npm install
-npm run dev        # http://localhost:5180
-npm test           # financial-math unit tests (Vitest)
-npm run typecheck
-npm run build
+npm run dev        # → http://localhost:5180
 ```
 
-Sign in by picking a demo profile (**Alex** or **Sarah**, personal) or **System Admin**. There are no passwords. Profiles are demo identities, and the admin role is a frontend demonstration, not access control.
+other spells:
 
-## Modules (v2)
+```bash
+npm test           # run the money-math tests
+npm run typecheck  # make sure typescript is happy
+npm run build      # production build
+```
 
-- **Debts & EMIs** (`/debts`): loans, EMIs and card balances; payments split into interest and principal; avalanche or snowball payoff plans with an extra-payment slider; debt-free date, interest saved, debt-to-income ratio, amortization schedules.
-- **Split** (`/split`): groups, shared expenses split equally, by exact amounts or by percentage (shares always sum exactly), balances, and settle-up in the fewest transfers.
-- **Tax planner** (`/tax`): India's new vs old regime on your real income (FY 2025-26 slabs, §87A rebate with marginal relief, 4% cess), deduction caps, break-even insight, ledger hints for 80D. Estimates only.
-- **What-if** (`/what-if`): change income, add costs, trim categories, model a big purchase or a job gap, and see a 24-month projection plus how goal dates shift.
+---
 
-All of their maths lives in `src/lib/{debts,split,tax,simulate}.ts`, covered by `src/lib/modules.test.ts`.
-
-## Stack
-
-React 19 · TypeScript · Vite 6 · Tailwind CSS 4 · Framer Motion 12 · GSAP 3 (ScrollTrigger, SplitText) · Lenis · Zustand 5 · React Router 7 · Recharts 2 · React Hook Form + Zod · Lucide.
-
-## Structure
+## 📁 where stuff lives
 
 ```
 src/
-  app/                 App shell, router (lazy routes), guards, error boundary
-  components/
-    ui/                Button, Field/Input/Select/MoneyInput/Switch/Checkbox, Dialog/Drawer/Confirm,
-                       Segmented, Badge, Progress, Ring, Menu, Panel, Delta, Toaster, CategoryGlyph
-    layout/            AppShell (sidebar, top bar, mobile tab bar + drawer), CommandPalette, PageHeader, Wordmark
-    charts/            Cash-flow composed chart, area, bars, custom SVG donut, rank bars, sparkline, tooltip, legend chips
-    animations/        GSAP setup; AnimatedNumber, SplitReveal, Reveal, ScrollLitText, Ticker, Parallax,
-                       useRecoil, useMagnetic, burst; CurtainIntro, SmoothScroll (Lenis), PageTransition
-  features/            dashboard · transactions · accounts · income · expenses · budgets · savings ·
-                       recurring · analytics · reports · notifications · settings · admin · auth
-  lib/finance.ts       Pure calculations (totals, balances, budgets + rollover, goals, recurrence, forecasts, anomalies)
-  store/               finance (domain data + actions), prefs (persisted preferences), ui (toasts, overlays)
-  services/            Repository boundary (localStorage today, swappable for an API)
-  schemas/             Zod schemas for every form, persisted data, backups and CSV rows
-  mock-data/seed.ts    Deterministic demo datasets generated relative to today
-  hooks/ utils/ constants/ types/ styles/
-legacy/                The original three files, kept as the functional reference only
-docs/                  TTM motion analysis · feature-parity checklist
+  features/     → every page (dashboard, debts, split, tax, what-if…)
+  lib/          → the money math (finance, debts, split, tax, simulate) + tests
+  components/   → ui pieces, charts, animations, the fancy fx layer
+  store/        → app state (zustand)
+  schemas/      → validation (zod)
+legacy/         → the OG v0 html/css/js version, kept for nostalgia 🥲
+docs/           → the nerdy deep dives
 ```
 
-## Money
+want the full technical breakdown? → [`docs/TECHNICAL.md`](docs/TECHNICAL.md)
+motion design research → [`docs/TTM_MOTION_ANALYSIS.md`](docs/TTM_MOTION_ANALYSIS.md)
+everything carried over from v0 → [`docs/FEATURE_PARITY.md`](docs/FEATURE_PARITY.md)
 
-All amounts are **integer minor units** (paise/cents). User input is parsed as a string straight to minor units (`parseMoney`), so `0.1 + 0.2` is exactly `30`. Currency conversion is one integer multiply/divide with a single rounding step. Formatting passes exact decimal strings to `Intl.NumberFormat`. Tests in `src/lib/finance.test.ts` cover parsing, conversion, totals, transfers, rollover budgets, goal ETAs, month-end clamping for recurrences and forecasts.
+---
 
-## Design system
+## 🙏 the fine print (read it, it's short)
 
-**Palette: Vanilla `#FFEBAF` × Moonstone `#4C9DB0`.** Light is the default theme ("Vanilla"). The page is true Vanilla paper, cards are a lighter cream, Moonstone carries every action (buttons, active nav, links, focus, the income series), and text is a deep Moonstone ink (`#11343D`) instead of black. The dark theme ("Moonstone night") is a deep Moonstone-ink ledger with Vanilla as the highlighter for primary actions and figures. Gains (sea green), losses (terracotta) and warnings (ochre) are tuned to sit inside the palette. Every text/background pair passes WCAG AA (4.7:1 minimum). Buttons use dark ink on Moonstone (4.9:1), because Vanilla on Moonstone is only 2.6:1. That swatch pairing appears only in the decorative intro curtain.
+- it's a **front-end demo**. demo login = no real authentication. don't put your actual bank details in here
+- your data stays in **your** browser. clear your browser data and it's gone, so use **Settings → Export backup** if you care
+- tax numbers are **estimates** based on FY 2025-26 rules. check the current year before you file
 
-- **Tokens** are in `src/styles/index.css`: backgrounds (`bg`, `sunken`), three surface steps, hover, two line weights, four text levels, accent/pos/neg/warn/info with soft variants, grid colour, three shadow levels (inset highlight + depth in dark mode), scrim, type scale, radii and easing curves. Tailwind reads them through `@theme`, so `bg-surface`, `text-fg-3`, `border-line` and the rest switch with the theme.
-- **Type.** Geist for UI. Geist Mono, uppercase and tracked, for labels and metadata (the "ledger" voice). Instrument Serif italic for a few editorial accents. Every figure uses tabular, slashed-zero numerals (`.num`).
-- **Category palette.** Ten hues derived from the two brand colours (moonstone, vanilla gold, deep teal, seafoam, sage, terracotta…) in `constants/palette.ts`. Data saved under the old palette is recoloured on load (`LEGACY_COLOR_MAP`).
-- **One container** (`Panel`): 1px hairline, 14px radius, a faint top light, and a mono eyebrow over the title. Hierarchy comes from type and spacing, not from nesting cards inside cards.
+---
 
-## Motion
+## 📜 license
 
-**v2 layer** (`src/components/fx/`): film-cut route transitions (band panel + page title in display serif), editorial kinetic headlines, colour-block bands over a WebGL liquid shader (`LiquidCanvas`, no 3D library), a cursor follower, pointer spotlight on panels, 3D tilt on cards, a velocity-reactive word marquee. Film cuts and the cursor can be turned off in Settings; everything respects reduced motion.
+[MIT](LICENSE). do whatever, just keep the credit. 🫶
 
-The motion language comes from a runtime study of ttm.supply. See [`docs/TTM_MOTION_ANALYSIS.md`](docs/TTM_MOTION_ANALYSIS.md) for what was observed, what was inferred, and how each idea was translated. In brief:
+---
 
-- **Two speeds.** UI feedback runs 0.15–0.45s. Spatial "settle" moves run 0.9–2.6s on expo-out. Tokens are in `constants/motion.ts`.
-- **GSAP** handles orchestrated timelines (curtain intro, dashboard hero entrance), SplitText word/char reveals, counters, ScrollTrigger batch reveals, scroll-scrubbed "lit" text, the velocity-reactive ticker, the gauge needle (`svgOrigin` + elastic), the orbit ring on login, pointer recoil, magnetic buttons and milestone bursts.
-- **Framer Motion** handles route transitions, shared-layout indicators (nav, segmented controls, tabs, command palette highlight), dialogs, drawers, sheets, toasts, list presence, SVG path drawing and springs.
-- **CSS** handles hover colour shifts and lightweight keyframes.
-- Every GSAP effect is scoped with `gsap.context()` and reverted on unmount.
-- `prefers-reduced-motion`, or Settings → Reduce motion, disables the curtain, counters, reveals, scrubs, the ticker and Lenis, and content renders in its final state.
+<div align="center">
 
-## Security notes (frontend scope)
+**Built with ❤️ by Ruthwik**
 
-- No credentials are stored. The legacy app's plaintext-password keys are removed on load.
-- All rendering goes through React, with no `dangerouslySetInnerHTML`. Text inputs are trimmed and stripped of control characters by Zod.
-- Imports (CSV and JSON backups) are size-capped at 5 MB, parsed without `eval`, and schema-validated before anything is written. CSV import shows a preview first.
-- CSV exports neutralise spreadsheet formula injection.
-- Downloads use revocable Blob URLs. No user data goes into URLs.
-- Persisted data is re-validated on load. If validation fails, the app starts from a clean workspace instead of crashing.
+[GitHub](https://github.com/ruthwik11) | [Website](https://cadence-budget-planner.vercel.app)
 
-This is **not** secure authentication. Anyone with access to the browser can read or change the data.
+</div>
 
-## Swapping in a backend
-
-`services/repository.ts` defines `DataRepository { load, save, clear }`. The store only goes through that interface, so an HTTP implementation can replace `localRepository` without touching UI code.
+---
